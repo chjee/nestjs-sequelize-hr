@@ -1,3 +1,3 @@
 # qrpass-iot
 
-QR Pass-IOT
+NestJs Sequlize HR
