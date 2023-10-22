@@ -1,6 +1,4 @@
 import {
-  IsDate,
-  IsDecimal,
   IsEmail,
   IsNotEmpty,
   IsNumber,
@@ -34,7 +32,7 @@ export class CreateEmployeeDto {
   readonly phone_number?: string;
 
   @IsNotEmpty()
-  @IsDate()
+  @IsString()
   readonly hire_date: Date;
 
   @IsNotEmpty()
@@ -43,10 +41,10 @@ export class CreateEmployeeDto {
   readonly job_id: string;
 
   @IsNotEmpty()
-  @IsDecimal()
+  @IsNumber()
   readonly salary: number;
 
-  @IsDecimal()
+  @IsNumber()
   readonly commission_pct?: number;
 
   @IsNumber()
