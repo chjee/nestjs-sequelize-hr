@@ -33,14 +33,14 @@ export class DepartmentsController {
 
   @Patch(':id')
   update(
-    @Param('id', new ParseIntPipe()) id: string,
+    @Param('id', new ParseIntPipe()) id: number,
     @Body() updateDepartmentDto: UpdateDepartmentDto,
   ) {
     return this.departmentsService.update(+id, updateDepartmentDto);
   }
 
   @Delete(':id')
-  remove(@Param('id', new ParseIntPipe()) id: string) {
+  remove(@Param('id', new ParseIntPipe()) id: number) {
     return this.departmentsService.remove(+id);
   }
 }
