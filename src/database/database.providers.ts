@@ -12,6 +12,9 @@ export const databaseProviders = [
         username: 'echonrich',
         password: 'echonrich0928',
         database: 'hr',
+        define: {
+          timestamps: false,
+        },
       });
       sequelize.addModels([Department]);
       await sequelize.sync();
