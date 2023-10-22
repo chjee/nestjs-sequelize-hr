@@ -1,3 +1,3 @@
-# qrpass-iot
+# HR - Oracle
 
 NestJs Sequlize HR
