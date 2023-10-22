@@ -1,5 +1,6 @@
 import { Sequelize } from 'sequelize-typescript';
 import { Department } from '../departments/entities/department.entity';
+import { Employee } from '../employees/entities/employee.entity';
 
 export const databaseProviders = [
   {
@@ -16,7 +17,7 @@ export const databaseProviders = [
           timestamps: false,
         },
       });
-      sequelize.addModels([Department]);
+      sequelize.addModels([Department, Employee]);
       await sequelize.sync();
       return sequelize;
     },
