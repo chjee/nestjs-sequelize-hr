@@ -8,6 +8,7 @@ import {
   DataType,
   Default,
   ForeignKey,
+  BelongsTo,
 } from 'sequelize-typescript';
 import { Employee } from '../../employees/entities/employee.entity';
 import { Location } from './location.entity';
@@ -38,4 +39,10 @@ export class Department extends Model<Department> {
   @ForeignKey(() => Location)
   @Column(DataType.BIGINT.UNSIGNED)
   location_id?: number;
+
+  @BelongsTo(() => Employee)
+  manager: Employee;
+
+  @BelongsTo(() => Location)
+  location: Location;
 }

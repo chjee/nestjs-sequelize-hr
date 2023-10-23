@@ -8,6 +8,7 @@ import {
   Comment,
   ForeignKey,
   DataType,
+  BelongsTo,
 } from 'sequelize-typescript';
 import { Region } from './region.entity';
 
@@ -30,4 +31,7 @@ export class Country extends Model<Country> {
   @ForeignKey(() => Region)
   @Column(DataType.BIGINT.UNSIGNED)
   region_id: number;
+
+  @BelongsTo(() => Region)
+  region: Region;
 }
