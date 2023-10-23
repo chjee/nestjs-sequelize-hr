@@ -45,7 +45,7 @@ export class Location extends Model<Location> {
 
   @Comment('')
   @AllowNull(false)
-  @Column(DataType.STRING(2))
   @ForeignKey(() => Country)
+  @Column(DataType.STRING(2))
   country_id: string;
 }

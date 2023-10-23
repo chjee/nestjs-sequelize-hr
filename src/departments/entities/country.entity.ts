@@ -27,7 +27,7 @@ export class Country extends Model<Country> {
 
   @Comment('')
   @AllowNull(false)
-  @Column(DataType.BIGINT.UNSIGNED)
   @ForeignKey(() => Region)
+  @Column(DataType.BIGINT.UNSIGNED)
   region_id: number;
 }

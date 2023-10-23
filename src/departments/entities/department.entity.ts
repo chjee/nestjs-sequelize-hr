@@ -7,7 +7,10 @@ import {
   Comment,
   DataType,
   Default,
+  ForeignKey,
 } from 'sequelize-typescript';
+import { Employee } from '../../employees/entities/employee.entity';
+import { Location } from './location.entity';
 
 @Table({ tableName: 'departments' })
 export class Department extends Model<Department> {
@@ -25,12 +28,14 @@ export class Department extends Model<Department> {
   @Comment('')
   @AllowNull(true)
   @Default(null)
+  @ForeignKey(() => Employee)
   @Column(DataType.BIGINT.UNSIGNED)
   manager_id?: number;
 
   @Comment('')
   @AllowNull(true)
   @Default(null)
+  @ForeignKey(() => Location)
   @Column(DataType.BIGINT.UNSIGNED)
   location_id?: number;
 }
