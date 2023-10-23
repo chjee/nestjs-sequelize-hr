@@ -2,6 +2,8 @@ import { Inject, Injectable } from '@nestjs/common';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { Employee } from './entities/employee.entity';
+import { Job } from './entities/job.entity';
+import { Department } from '../departments/entities/department.entity';
 
 @Injectable()
 export class EmployeesService {
@@ -10,27 +12,30 @@ export class EmployeesService {
     private readonly employeeRepository: typeof Employee,
   ) {}
 
-  create(createEmployeeDto: CreateEmployeeDto) {
+  async create(createEmployeeDto: CreateEmployeeDto) {
     return this.employeeRepository.create<Employee>(createEmployeeDto);
   }
 
-  findAll() {
-    return this.employeeRepository.findAll<Employee>();
+  async findAll() {
+    return this.employeeRepository.findAll<Employee>({
+      include: [Employee, Job, Department],
+    });
   }
 
-  findOne(id: number) {
+  async findOne(id: number) {
     return this.employeeRepository.findOne({
+      include: [Employee, Job, Department],
       where: { employee_id: id },
     });
   }
 
-  update(id: number, updateEmployeeDto: UpdateEmployeeDto) {
+  async update(id: number, updateEmployeeDto: UpdateEmployeeDto) {
     return this.employeeRepository.update(updateEmployeeDto, {
       where: { employee_id: id },
     });
   }
 
-  remove(id: number) {
+  async remove(id: number) {
     return this.employeeRepository.destroy({
       where: { employee_id: id },
     });
