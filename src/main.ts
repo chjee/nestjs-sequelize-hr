@@ -7,7 +7,13 @@ async function bootstrap() {
     logger: ['error', 'warn', 'log', 'debug', 'verbose'],
     cors: { origin: '*', methods: 'GET,HEAD,PUT,PATCH,POST,DELETE' },
   });
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
   await app.listen(3000);
   console.log(`Application is running on: ${await app.getUrl()}`);
 }
