@@ -8,6 +8,7 @@ import {
   Comment,
   ForeignKey,
   DataType,
+  BelongsTo,
 } from 'sequelize-typescript';
 import { Department } from '../../departments/entities/department.entity';
 import { Job } from './job.entity';
@@ -49,8 +50,8 @@ export class Employee extends Model<Employee> {
 
   @Comment('')
   @AllowNull(false)
-  @Column(DataType.STRING(10))
   @ForeignKey(() => Job)
+  @Column(DataType.STRING(10))
   job_id: string;
 
   @Comment('')
@@ -67,14 +68,23 @@ export class Employee extends Model<Employee> {
   @Comment('')
   @AllowNull(true)
   @Default(null)
-  @Column(DataType.BIGINT.UNSIGNED)
   @ForeignKey(() => Employee)
+  @Column(DataType.BIGINT.UNSIGNED)
   manager_id?: number;
 
   @Comment('')
   @AllowNull(true)
   @Default(null)
-  @Column(DataType.BIGINT.UNSIGNED)
   @ForeignKey(() => Department)
+  @Column(DataType.BIGINT.UNSIGNED)
   department_id?: number;
+
+  @BelongsTo(() => Job)
+  job: Job;
+
+  @BelongsTo(() => Employee)
+  manager: Employee;
+
+  @BelongsTo(() => Department)
+  department: Department;
 }
