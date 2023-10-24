@@ -11,36 +11,41 @@ import {
 import { DepartmentsService } from './departments.service';
 import { CreateDepartmentDto } from './dto/create-department.dto';
 import { UpdateDepartmentDto } from './dto/update-department.dto';
+import { Department } from './entities/department.entity';
 
 @Controller('department')
 export class DepartmentsController {
   constructor(private readonly departmentsService: DepartmentsService) {}
 
   @Post()
-  create(@Body() createDepartmentDto: CreateDepartmentDto) {
+  async create(
+    @Body() createDepartmentDto: CreateDepartmentDto,
+  ): Promise<Department> {
     return this.departmentsService.create(createDepartmentDto);
   }
 
   @Get()
-  findAll() {
+  async findAll(): Promise<Department[]> {
     return this.departmentsService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id', new ParseIntPipe()) id: number) {
+  async findOne(
+    @Param('id', new ParseIntPipe()) id: number,
+  ): Promise<Department> {
     return this.departmentsService.findOne(+id);
   }
 
   @Patch(':id')
-  update(
+  async update(
     @Param('id', new ParseIntPipe()) id: number,
     @Body() updateDepartmentDto: UpdateDepartmentDto,
-  ) {
+  ): Promise<any> {
     return this.departmentsService.update(+id, updateDepartmentDto);
   }
 
   @Delete(':id')
-  remove(@Param('id', new ParseIntPipe()) id: number) {
+  async remove(@Param('id', new ParseIntPipe()) id: number): Promise<any> {
     return this.departmentsService.remove(+id);
   }
 }
