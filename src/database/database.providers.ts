@@ -18,6 +18,7 @@ export const databaseProviders = [
         username: 'echonrich',
         password: 'echonrich0928',
         database: 'hr',
+        logging: true,
         define: {
           timestamps: false,
         },
