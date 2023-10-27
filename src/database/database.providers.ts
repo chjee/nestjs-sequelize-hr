@@ -6,13 +6,13 @@ import { Country } from '../departments/entities/country.entity';
 import { Region } from '../departments/entities/region.entity';
 import { Job } from '../employees/entities/job.entity';
 import { JobHistory } from '../employees/entities/jobhistory.entity';
-import config from '../config/configuration';
+import configDatabase from '../config/config.database';
 
 export const databaseProviders = [
   {
     provide: 'SEQUELIZE',
     useFactory: async () => {
-      const sequelize = new Sequelize(config().database);
+      const sequelize = new Sequelize(configDatabase());
       sequelize.addModels([
         Department,
         Employee,
