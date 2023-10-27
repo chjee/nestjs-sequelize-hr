@@ -6,18 +6,18 @@ export type User = any;
 export class UsersService {
   private readonly users: User[] = [
     {
-      userId: 1,
-      username: 'admin',
+      userid: 'admin',
+      username: 'john',
       password: 'whoami',
     },
     {
-      userId: 2,
-      username: 'chjee',
+      userid: 'chjee',
+      username: 'andrew',
       password: 'guess',
     },
   ];
 
-  async findOne(username: string): Promise<User | undefined> {
-    return this.users.find((user) => user.username === username);
+  async findOne(userid: string): Promise<User | undefined> {
+    return this.users.find((user) => user.userid === userid);
   }
 }
