@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -14,7 +15,10 @@ async function bootstrap() {
       transform: true,
     }),
   );
-  await app.listen(3000);
+
+  const configSerivce = app.get(ConfigService);
+  const listenPort = configSerivce.get<number>('PORT', 3000);
+  await app.listen(listenPort);
   console.log(`Application is running on: ${await app.getUrl()}`);
 }
 bootstrap();
