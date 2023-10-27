@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { DepartmentsModule } from './departments/departments.module';
 import { EmployeesModule } from './employees/employees.module';
 import { ConfigModule } from '@nestjs/config';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { ConfigModule } from '@nestjs/config';
     }),
     DepartmentsModule,
     EmployeesModule,
+    UsersModule,
   ],
   controllers: [],
   providers: [],
