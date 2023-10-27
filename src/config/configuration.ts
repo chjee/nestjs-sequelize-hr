@@ -21,5 +21,5 @@ export default registerAs('config', () => ({
       timestamps: false,
     },
   },
-  jwtkey: process.env.JWT_SECRET,
+  secret: process.env.JWT_SECRET,
 }));
