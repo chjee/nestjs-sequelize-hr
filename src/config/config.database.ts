@@ -14,7 +14,7 @@ export default registerAs('database', () => ({
     acquire: 30000,
     idle: 10000,
   },
-  logging: false,
+  logging: process.env.DB_LOGGING === 'true' ? true : false,
   define: {
     timestamps: false,
   },
