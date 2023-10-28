@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsString, Length } from 'class-validator';
 
-export class CreateDepartmentDto {
+export class SignInUserDto {
   @IsNotEmpty()
   @IsString()
   @Length(5, 20)
