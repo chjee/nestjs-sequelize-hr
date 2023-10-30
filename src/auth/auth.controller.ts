@@ -44,6 +44,7 @@ export class AuthController {
   async signIn(@Body() signInUserDto: SignInUserDto): Promise<any> {
     return this.authService.signIn(signInUserDto);
   }
+
   @ApiBearerAuth('access_token')
   @Get('profile')
   @ApiOperation({
