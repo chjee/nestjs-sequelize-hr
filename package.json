@@ -1,10 +1,25 @@
 {
-  "name": "qrpass-iot",
+  "name": "nestjs-sequelize-hr",
   "version": "0.0.1",
-  "description": "",
-  "author": "",
+  "description": "NestJS, Sequelize, MySQL, TypeScript를 이용한 HR API",
+  "author": "Changhoon Jee",
   "private": true,
   "license": "UNLICENSED",
+  "keywords": [
+    "nestJS",
+    "nestjs",
+    "nest",
+    "sequelize",
+    "sequelize-typescript",
+    "typescript",
+    "jwt",
+    "nodeJS",
+    "node.js",
+    "node",
+    "expressJS",
+    "swagger", 
+    "mysql2"
+  ],
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
