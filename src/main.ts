@@ -26,9 +26,9 @@ async function bootstrap() {
       {
         type: 'http',
         scheme: 'bearer',
-        name: 'JWT',
+        name: 'JWT', // Key name in the swagger
         description: 'Enter JWT token',
-        bearerFormat: 'Token',
+        bearerFormat: 'JWT', // Optional
         in: 'header',
       },
       'access_token',
