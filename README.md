@@ -34,28 +34,6 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
-## Run tests
-
-```sh
-$ npm run test
-```
-
-## Other commands
-
-```sh
-# generate prisma client
-$ npm run generate
-
-# generate prisma migration
-$ npm run migrate:save
-
-# apply prisma migration
-$ npm run migrate:up
-
-# revert prisma migration
-$ npm run migrate:down
-```
-
 ## .env configuration
 
 ```sh
