@@ -138,7 +138,7 @@ export class EmployeesController {
     example: 207,
   })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  async emove(@Param('id', new ParseIntPipe()) id: number): Promise<any> {
+  async remove(@Param('id', new ParseIntPipe()) id: number): Promise<any> {
     return this.employeesService.remove(+id);
   }
 }
