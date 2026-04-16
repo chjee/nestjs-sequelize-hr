@@ -1,10 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import {
+  IsDateString,
   IsEmail,
   IsNotEmpty,
   IsNumber,
+  IsOptional,
   IsString,
   Length,
+  Max,
   Min,
 } from 'class-validator';
 
@@ -24,7 +28,9 @@ export class CreateEmployeeDto {
     example: 'Steven',
     minLength: 2,
     maxLength: 20,
+    required: false,
   })
+  @IsOptional()
   @IsString()
   @Length(2, 20)
   readonly first_name?: string;
@@ -56,17 +62,20 @@ export class CreateEmployeeDto {
     example: '515.123.4567',
     minLength: 2,
     maxLength: 20,
+    required: false,
   })
+  @IsOptional()
   @IsString()
   @Length(2, 20)
   readonly phone_number?: string;
 
   @ApiProperty({
-    description: 'Hire Date',
+    description: 'Hire Date (ISO 8601)',
     example: '2003-06-17',
   })
   @IsNotEmpty()
-  @IsString()
+  @IsDateString()
+  @Transform(({ value }) => (value ? new Date(value) : value))
   readonly hire_date: Date;
 
   @ApiProperty({
@@ -87,29 +96,41 @@ export class CreateEmployeeDto {
   })
   @IsNotEmpty()
   @IsNumber()
+  @Min(0)
   readonly salary: number;
 
   @ApiProperty({
     description: 'Commission PCT',
     example: 0.2,
     minimum: 0,
+    maximum: 0.99,
+    required: false,
   })
-  @IsNumber()
+  @IsOptional()
+  @IsNumber({ maxDecimalPlaces: 2 })
+  @Min(0)
+  @Max(0.99)
   readonly commission_pct?: number;
 
   @ApiProperty({
     description: 'Manager ID',
     example: 103,
     minimum: 0,
+    required: false,
   })
+  @IsOptional()
   @IsNumber()
+  @Min(0)
   readonly manager_id?: number;
 
   @ApiProperty({
     description: 'Department ID',
     example: 60,
     minimum: 0,
+    required: false,
   })
+  @IsOptional()
   @IsNumber()
+  @Min(0)
   readonly department_id?: number;
 }
