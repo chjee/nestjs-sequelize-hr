@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsString, Length, Min } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString, Length, Min } from 'class-validator';
 
 export class CreateDepartmentDto {
   @ApiProperty({
@@ -27,17 +27,21 @@ export class CreateDepartmentDto {
     description: 'Manager ID',
     example: 200,
     minimum: 0,
+    required: false,
   })
+  @IsOptional()
   @IsNumber()
   @Min(0)
-  readonly manager_id: number;
+  readonly manager_id?: number;
 
   @ApiProperty({
     description: 'Location ID',
     example: 1700,
     minimum: 0,
+    required: false,
   })
+  @IsOptional()
   @IsNumber()
   @Min(0)
-  readonly location_id: number;
+  readonly location_id?: number;
 }
