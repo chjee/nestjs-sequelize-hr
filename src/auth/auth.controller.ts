@@ -6,8 +6,10 @@ import {
   HttpStatus,
   Post,
   Request,
+  UseGuards,
 } from '@nestjs/common';
-import { AuthService } from './auth.service';
+import { ThrottlerGuard } from '@nestjs/throttler';
+import { AuthService, SignInResponse } from './auth.service';
 import { SignInUserDto } from '../users/dto/signin-user.dto';
 import { Public } from './decorators/public.decorator';
 import {
@@ -24,6 +26,7 @@ import {
 export class AuthController {
   constructor(private authService: AuthService) {}
 
+  @UseGuards(ThrottlerGuard)
   @Public()
   @HttpCode(HttpStatus.OK)
   @Post('login')
@@ -41,7 +44,7 @@ export class AuthController {
     },
   })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  async signIn(@Body() signInUserDto: SignInUserDto): Promise<any> {
+  async signIn(@Body() signInUserDto: SignInUserDto): Promise<SignInResponse> {
     return this.authService.signIn(signInUserDto);
   }
 
