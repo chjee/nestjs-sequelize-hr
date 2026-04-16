@@ -22,7 +22,9 @@ export const databaseProviders = [
         Job,
         JobHistory,
       ]);
-      await sequelize.sync();
+      if (process.env.DB_SYNC === 'true') {
+        await sequelize.sync();
+      }
       return sequelize;
     },
   },
