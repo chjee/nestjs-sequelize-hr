@@ -7,6 +7,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
+import { REQUEST_ID_HEADER } from '../middleware/request-id.middleware';
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
@@ -28,7 +29,14 @@ export class AllExceptionsFilter implements ExceptionFilter {
         : 'Internal server error';
 
     if (status === HttpStatus.INTERNAL_SERVER_ERROR) {
-      this.logger.error(exception);
+      this.logger.error({
+        requestId: request.headers[REQUEST_ID_HEADER],
+        method: request.method,
+        path: request.url,
+        statusCode: status,
+        error: exception instanceof Error ? exception.message : String(exception),
+        timestamp: new Date().toISOString(),
+      });
     }
 
     response.status(status).json({

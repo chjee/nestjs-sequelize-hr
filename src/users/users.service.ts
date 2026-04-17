@@ -20,10 +20,13 @@ export class UsersService {
     return this.userRepository.findOne({ where: { userid } });
   }
 
-  async findAll(): Promise<User[]> {
-    return this.userRepository.findAll({
+  async findAll(page = 1, limit = 20): Promise<{ data: User[]; total: number }> {
+    const { rows, count } = await this.userRepository.findAndCountAll({
       attributes: { exclude: ['password'] },
+      limit,
+      offset: (page - 1) * limit,
     });
+    return { data: rows, total: count };
   }
 
   async findById(id: number): Promise<User> {
