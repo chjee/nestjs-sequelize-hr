@@ -1,7 +1,6 @@
-import { DataTypes, QueryInterface } from 'sequelize';
-import { MigrationFn } from 'umzug';
+import { DataTypes } from 'sequelize';
 
-export const up: MigrationFn<QueryInterface> = async ({ context: qi }) => {
+export const up = async ({ context: qi }) => {
   await qi.createTable('refresh_tokens', {
     id: {
       type: DataTypes.INTEGER.UNSIGNED,
@@ -32,6 +31,6 @@ export const up: MigrationFn<QueryInterface> = async ({ context: qi }) => {
   });
 };
 
-export const down: MigrationFn<QueryInterface> = async ({ context: qi }) => {
+export const down = async ({ context: qi }) => {
   await qi.dropTable('refresh_tokens');
 };
