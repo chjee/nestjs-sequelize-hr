@@ -1,4 +1,4 @@
-import { NestFactory, HttpAdapterHost } from '@nestjs/core';
+import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -53,7 +53,7 @@ async function bootstrap() {
   });
 
   const configService = app.get(ConfigService);
-  const listenPort = configService.get<number>('PORT', 3000);
+  const listenPort = configService.get<number>('LISTEN_PORT', 3000);
   await app.listen(listenPort);
   logger.log(`Application is running on: ${await app.getUrl()}`);
 }
