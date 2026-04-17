@@ -16,10 +16,13 @@ export class DepartmentsService {
     return this.departmentRepository.create<Department>(createDepartmentDto);
   }
 
-  async findAll(): Promise<Department[]> {
-    return this.departmentRepository.findAll<Department>({
+  async findAll(page = 1, limit = 20): Promise<{ data: Department[]; total: number }> {
+    const { rows, count } = await this.departmentRepository.findAndCountAll({
+      limit,
+      offset: (page - 1) * limit,
       include: [Employee, Location],
     });
+    return { data: rows, total: count };
   }
 
   async findOne(id: number): Promise<Department> {

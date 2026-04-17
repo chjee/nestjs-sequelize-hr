@@ -21,6 +21,7 @@ import * as Joi from 'joi';
         DB_PASSWORD: Joi.string().allow('').required(),
         DB_NAME: Joi.string().required(),
         PORT: Joi.number().default(3000),
+        ALLOWED_ORIGINS: Joi.string().optional(),
       }),
     }),
     ThrottlerModule.forRoot({

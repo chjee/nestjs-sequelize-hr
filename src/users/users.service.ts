@@ -1,25 +1,76 @@
-import { Injectable } from '@nestjs/common';
-
-export type User = any;
+import {
+  ConflictException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { User } from './entities/user.entity';
 
 @Injectable()
 export class UsersService {
-  // 임시 샘플 계정 — DB 전환(3차 PR) 전까지만 사용
-  // 비밀번호: admin → admin1234, chjee → chjee1234 (기존 평문 계정 폐기)
-  private readonly users: User[] = [
-    {
-      userid: 'admin',
-      username: 'john',
-      password: '$2b$10$BhcYrujTe9oKvRQotsRCEujdEd3yVwQwkFpFLvgYo6TOsGxQc4IYu',
-    },
-    {
-      userid: 'chjee',
-      username: 'andrew',
-      password: '$2b$10$i6WSYSNlDcwsWBWodCuDZeyF1Pb0g7yjW44iUwHYQ99UQnmOAYlUO',
-    },
-  ];
+  constructor(
+    @Inject('USER_REPOSITORY')
+    private readonly userRepository: typeof User,
+  ) {}
 
-  async findOne(userid: string): Promise<User | undefined> {
-    return this.users.find((user) => user.userid === userid);
+  async findOne(userid: string): Promise<User | null> {
+    return this.userRepository.findOne({ where: { userid } });
+  }
+
+  async findAll(): Promise<User[]> {
+    return this.userRepository.findAll({
+      attributes: { exclude: ['password'] },
+    });
+  }
+
+  async findById(id: number): Promise<User> {
+    const user = await this.userRepository.findOne({
+      where: { id },
+      attributes: { exclude: ['password'] },
+    });
+    if (!user) {
+      throw new NotFoundException(`User #${id} not found`);
+    }
+    return user;
+  }
+
+  async create(createUserDto: CreateUserDto): Promise<User> {
+    const existing = await this.userRepository.findOne({
+      where: { userid: createUserDto.userid },
+    });
+    if (existing) {
+      throw new ConflictException(`User '${createUserDto.userid}' already exists`);
+    }
+    const hashed = await bcrypt.hash(createUserDto.password, 10);
+    const user = await this.userRepository.create({
+      ...createUserDto,
+      password: hashed,
+    } as User);
+    const { password: _, ...result } = user.toJSON() as User & { password: string };
+    return result as User;
+  }
+
+  async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
+    const data: Partial<User> = { ...updateUserDto } as Partial<User>;
+    if (updateUserDto.password) {
+      data.password = await bcrypt.hash(updateUserDto.password, 10);
+    }
+    const [affectedCount] = await this.userRepository.update(data, {
+      where: { id },
+    });
+    if (affectedCount === 0) {
+      throw new NotFoundException(`User #${id} not found`);
+    }
+    return this.findById(id);
+  }
+
+  async remove(id: number): Promise<void> {
+    const deletedCount = await this.userRepository.destroy({ where: { id } });
+    if (deletedCount === 0) {
+      throw new NotFoundException(`User #${id} not found`);
+    }
   }
 }

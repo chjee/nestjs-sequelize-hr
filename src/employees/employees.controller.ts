@@ -7,7 +7,9 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  Query,
 } from '@nestjs/common';
+import { PaginationDto } from '../common/dto/pagination.dto';
 import { EmployeesService } from './employees.service';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
@@ -62,12 +64,19 @@ export class EmployeesController {
   @Get()
   @ApiOperation({
     summary: 'Employee List API',
-    description: 'Get all employees',
+    description: 'Get all employees with pagination',
   })
-  @ApiOkResponse({ type: [CreateEmployeeDto] })
+  @ApiOkResponse({
+    schema: {
+      example: { data: [], total: 107 },
+    },
+  })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  async findAll(): Promise<Employee[]> {
-    return this.employeesService.findAll();
+  async findAll(
+    @Query() paginationDto: PaginationDto,
+  ): Promise<{ data: Employee[]; total: number }> {
+    const { page = 1, limit = 20 } = paginationDto;
+    return this.employeesService.findAll(page, limit);
   }
 
   @ApiBearerAuth('access_token')
