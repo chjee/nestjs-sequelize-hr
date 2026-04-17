@@ -4,15 +4,21 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
+import helmet from 'helmet';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
   const app = await NestFactory.create(AppModule, {
     cors: {
-      origin: process.env.ALLOWED_ORIGINS?.split(',') ?? ['http://localhost:3000'],
+      origin:
+        process.env.NODE_ENV === 'production'
+          ? process.env.ALLOWED_ORIGINS?.split(',')
+          : ['http://localhost:3000'],
       methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+      credentials: true,
     },
   });
+  app.use(helmet());
   app.useGlobalFilters(new AllExceptionsFilter());
   app.useGlobalPipes(
     new ValidationPipe({

@@ -8,7 +8,7 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { ThrottlerGuard } from '@nestjs/throttler';
+import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { AuthService, TokenResponse } from './auth.service';
 import { SignInUserDto } from '../users/dto/signin-user.dto';
 import { Public } from './decorators/public.decorator';
@@ -45,6 +45,8 @@ export class AuthController {
     return this.authService.signIn(signInUserDto);
   }
 
+  @UseGuards(ThrottlerGuard)
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
   @Public()
   @HttpCode(HttpStatus.OK)
   @Post('refresh')
@@ -55,6 +57,8 @@ export class AuthController {
     return this.authService.refresh(token);
   }
 
+  @UseGuards(ThrottlerGuard)
+  @Throttle({ default: { limit: 20, ttl: 60000 } })
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('logout')
   @ApiBearerAuth('access_token')
