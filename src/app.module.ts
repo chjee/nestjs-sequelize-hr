@@ -12,6 +12,8 @@ import { HealthModule } from './health/health.module';
 import { AuditModule } from './audit/audit.module';
 import { AuditInterceptor } from './common/interceptors/audit.interceptor';
 import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 import * as Joi from 'joi';
 
 @Module({
@@ -19,14 +21,20 @@ import * as Joi from 'joi';
     ConfigModule.forRoot({
       isGlobal: true,
       cache: true,
-      envFilePath: ['.env.dev', '.env'],
+      envFilePath: ['.env.local', '.env'],
       validationSchema: Joi.object({
         JWT_SECRET: Joi.string().min(32).required(),
         DB_HOST: Joi.string().required(),
+        DB_PORT: Joi.number().default(3306),
         DB_USERNAME: Joi.string().required(),
-        DB_PASSWORD: Joi.string().allow('').required(),
+        DB_PASSWORD: Joi.string().required(),
         DB_NAME: Joi.string().required(),
-        PORT: Joi.number().default(3000),
+        DB_POOL_MAX: Joi.number().default(5),
+        DB_POOL_MIN: Joi.number().default(0),
+        DB_LOGGING: Joi.boolean().default(false),
+        DB_SYNC: Joi.boolean().default(false),
+        DB_MIGRATE: Joi.boolean().default(true),
+        LISTEN_PORT: Joi.number().default(3000),
         ALLOWED_ORIGINS: Joi.string().optional(),
         REFRESH_TOKEN_TTL_DAYS: Joi.number().default(7),
       }),
@@ -42,8 +50,9 @@ import * as Joi from 'joi';
     DepartmentsModule,
     EmployeesModule,
   ],
-  controllers: [],
+  controllers: [AppController],
   providers: [
+    AppService,
     { provide: 'APP_GUARD', useClass: AuthGuard },
     { provide: APP_INTERCEPTOR, useClass: AuditInterceptor },
   ],
