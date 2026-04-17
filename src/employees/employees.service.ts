@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { Employee } from './entities/employee.entity';
@@ -13,7 +13,14 @@ export class EmployeesService {
   ) {}
 
   async create(createEmployeeDto: CreateEmployeeDto): Promise<Employee> {
-    return this.employeeRepository.create<Employee>(createEmployeeDto);
+    try {
+      return await this.employeeRepository.create<Employee>(createEmployeeDto);
+    } catch (error) {
+      if (error instanceof Error && error.name === 'SequelizeForeignKeyConstraintError') {
+        throw new BadRequestException('Invalid job_id, manager_id, or department_id');
+      }
+      throw error;
+    }
   }
 
   async findAll(page = 1, limit = 20): Promise<{ data: Employee[]; total: number }> {
