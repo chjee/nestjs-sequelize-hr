@@ -4,7 +4,9 @@ import { AllExceptionsFilter } from './all-exceptions.filter';
 const mockJson = jest.fn();
 const mockStatus = jest.fn().mockReturnValue({ json: mockJson });
 const mockGetResponse = jest.fn().mockReturnValue({ status: mockStatus });
-const mockGetRequest = jest.fn().mockReturnValue({ url: '/test', method: 'GET', headers: {} });
+const mockGetRequest = jest
+  .fn()
+  .mockReturnValue({ url: '/test', method: 'GET', headers: {} });
 const mockSwitchToHttp = jest.fn().mockReturnValue({
   getResponse: mockGetResponse,
   getRequest: mockGetRequest,
@@ -18,7 +20,9 @@ describe('AllExceptionsFilter', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     filter = new AllExceptionsFilter();
-    loggerErrorSpy = jest.spyOn(Logger.prototype, 'error').mockImplementation(() => {});
+    loggerErrorSpy = jest
+      .spyOn(Logger.prototype, 'error')
+      .mockImplementation(() => {});
   });
 
   it('should be defined', () => {
@@ -40,7 +44,10 @@ describe('AllExceptionsFilter', () => {
     });
 
     it('400 BadRequestException → 400 상태코드 반환', () => {
-      const exception = new HttpException('Bad Request', HttpStatus.BAD_REQUEST);
+      const exception = new HttpException(
+        'Bad Request',
+        HttpStatus.BAD_REQUEST,
+      );
       filter.catch(exception, mockHost);
 
       expect(mockStatus).toHaveBeenCalledWith(HttpStatus.BAD_REQUEST);
@@ -50,7 +57,10 @@ describe('AllExceptionsFilter', () => {
     });
 
     it('HttpException 시 logger.error 호출 안 함', () => {
-      const exception = new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+      const exception = new HttpException(
+        'Unauthorized',
+        HttpStatus.UNAUTHORIZED,
+      );
       filter.catch(exception, mockHost);
       expect(loggerErrorSpy).not.toHaveBeenCalled();
     });

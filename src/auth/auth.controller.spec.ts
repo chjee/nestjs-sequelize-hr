@@ -34,7 +34,10 @@ describe('AuthController', () => {
 
   describe('signIn', () => {
     it('올바른 자격증명 → access_token 반환', async () => {
-      const mockResponse = { access_token: 'mock.jwt.token', refresh_token: 'mock.refresh.token' };
+      const mockResponse = {
+        access_token: 'mock.jwt.token',
+        refresh_token: 'mock.refresh.token',
+      };
       authService.signIn.mockResolvedValue(mockResponse);
 
       const result = await controller.signIn({

@@ -24,7 +24,8 @@ export class CreateUserDto {
   @IsString()
   @Length(8, 20)
   @Matches(/^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).+$/, {
-    message: 'password must contain at least one uppercase letter, one number, and one special character (@$!%*?&)',
+    message:
+      'password must contain at least one uppercase letter, one number, and one special character (@$!%*?&)',
   })
   readonly password: string;
 }

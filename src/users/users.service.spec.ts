@@ -14,7 +14,9 @@ const mockUser = (overrides: Record<string, unknown> = {}) => {
   const merged = { ...base, ...overrides };
   return {
     ...merged,
-    toJSON() { return merged; },
+    toJSON() {
+      return merged;
+    },
   } as unknown as User;
 };
 
@@ -64,7 +66,10 @@ describe('UsersService', () => {
   describe('findAll', () => {
     it('페이지네이션된 사용자 목록 반환', async () => {
       const users = [mockUser(), mockUser({ id: 2, userid: 'admin' })];
-      mockUserRepository.findAndCountAll.mockResolvedValue({ rows: users, count: 2 });
+      mockUserRepository.findAndCountAll.mockResolvedValue({
+        rows: users,
+        count: 2,
+      });
       const result = await service.findAll(1, 20);
       expect(result.data).toHaveLength(2);
       expect(result.total).toBe(2);
@@ -102,7 +107,11 @@ describe('UsersService', () => {
     it('중복 userid → ConflictException', async () => {
       mockUserRepository.findOne.mockResolvedValue(mockUser());
       await expect(
-        service.create({ userid: 'jsmith', username: 'John Smith', password: 'password123' }),
+        service.create({
+          userid: 'jsmith',
+          username: 'John Smith',
+          password: 'password123',
+        }),
       ).rejects.toThrow(ConflictException);
     });
   });

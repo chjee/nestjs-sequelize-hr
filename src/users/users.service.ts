@@ -20,7 +20,10 @@ export class UsersService {
     return this.userRepository.findOne({ where: { userid } });
   }
 
-  async findAll(page = 1, limit = 20): Promise<{ data: User[]; total: number }> {
+  async findAll(
+    page = 1,
+    limit = 20,
+  ): Promise<{ data: User[]; total: number }> {
     const { rows, count } = await this.userRepository.findAndCountAll({
       attributes: { exclude: ['password'] },
       limit,
@@ -45,14 +48,19 @@ export class UsersService {
       where: { userid: createUserDto.userid },
     });
     if (existing) {
-      throw new ConflictException(`User '${createUserDto.userid}' already exists`);
+      throw new ConflictException(
+        `User '${createUserDto.userid}' already exists`,
+      );
     }
     const hashed = await bcrypt.hash(createUserDto.password, 10);
     const user = await this.userRepository.create({
       ...createUserDto,
       password: hashed,
     } as User);
-    const { password: _, ...result } = user.toJSON() as User & { password: string };
+    const result = user.toJSON() as User & {
+      password: string;
+    };
+    delete result.password;
     return result as User;
   }
 

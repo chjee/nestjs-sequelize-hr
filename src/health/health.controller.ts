@@ -5,7 +5,6 @@ import {
   HealthCheckService,
   HealthIndicatorResult,
   HealthIndicator,
-  HealthIndicatorStatus,
 } from '@nestjs/terminus';
 import { Sequelize } from 'sequelize-typescript';
 import { Public } from '../auth/decorators/public.decorator';
@@ -40,7 +39,10 @@ export class HealthController {
   @Public()
   @Get()
   @HealthCheck()
-  @ApiOperation({ summary: 'Health Check API', description: 'Check DB connection status' })
+  @ApiOperation({
+    summary: 'Health Check API',
+    description: 'Check DB connection status',
+  })
   check() {
     return this.health.check([() => this.dbIndicator.pingCheck('database')]);
   }
