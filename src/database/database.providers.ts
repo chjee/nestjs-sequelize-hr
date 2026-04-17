@@ -8,6 +8,7 @@ import { Job } from '../employees/entities/job.entity';
 import { JobHistory } from '../employees/entities/jobhistory.entity';
 import { User } from '../users/entities/user.entity';
 import { RefreshToken } from '../auth/entities/refresh-token.entity';
+import { AuditLog } from '../audit/audit-log.entity';
 import configDatabase from '../config/config.database';
 import { runMigrations } from './migration.runner';
 
@@ -26,6 +27,7 @@ export const databaseProviders = [
         JobHistory,
         User,
         RefreshToken,
+        AuditLog,
       ]);
       if (process.env.DB_SYNC === 'true') {
         await sequelize.sync();

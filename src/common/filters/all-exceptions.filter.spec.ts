@@ -4,7 +4,7 @@ import { AllExceptionsFilter } from './all-exceptions.filter';
 const mockJson = jest.fn();
 const mockStatus = jest.fn().mockReturnValue({ json: mockJson });
 const mockGetResponse = jest.fn().mockReturnValue({ status: mockStatus });
-const mockGetRequest = jest.fn().mockReturnValue({ url: '/test' });
+const mockGetRequest = jest.fn().mockReturnValue({ url: '/test', method: 'GET', headers: {} });
 const mockSwitchToHttp = jest.fn().mockReturnValue({
   getResponse: mockGetResponse,
   getRequest: mockGetRequest,
@@ -71,10 +71,16 @@ describe('AllExceptionsFilter', () => {
       );
     });
 
-    it('500 에러 시 logger.error 호출', () => {
+    it('500 에러 시 구조화된 형식으로 logger.error 호출', () => {
       const exception = new Error('DB connection failed');
       filter.catch(exception, mockHost);
-      expect(loggerErrorSpy).toHaveBeenCalledWith(exception);
+      expect(loggerErrorSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          statusCode: 500,
+          error: 'DB connection failed',
+          path: '/test',
+        }),
+      );
     });
 
     it('응답에 timestamp 포함', () => {

@@ -1,4 +1,5 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 import { DepartmentsModule } from './departments/departments.module';
 import { EmployeesModule } from './employees/employees.module';
 import { ConfigModule } from '@nestjs/config';
@@ -8,6 +9,9 @@ import { AuthGuard } from './auth/auth.guard';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { DatabaseModule } from './database/database.module';
 import { HealthModule } from './health/health.module';
+import { AuditModule } from './audit/audit.module';
+import { AuditInterceptor } from './common/interceptors/audit.interceptor';
+import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
 import * as Joi from 'joi';
 
 @Module({
@@ -32,12 +36,20 @@ import * as Joi from 'joi';
     }),
     DatabaseModule,
     HealthModule,
+    AuditModule,
     UsersModule,
     AuthModule,
     DepartmentsModule,
     EmployeesModule,
   ],
   controllers: [],
-  providers: [{ provide: 'APP_GUARD', useClass: AuthGuard }],
+  providers: [
+    { provide: 'APP_GUARD', useClass: AuthGuard },
+    { provide: APP_INTERCEPTOR, useClass: AuditInterceptor },
+  ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(RequestIdMiddleware).forRoutes('*');
+  }
+}
