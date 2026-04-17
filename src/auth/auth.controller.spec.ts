@@ -34,14 +34,15 @@ describe('AuthController', () => {
 
   describe('signIn', () => {
     it('올바른 자격증명 → access_token 반환', async () => {
-      authService.signIn.mockResolvedValue({ access_token: 'mock.jwt.token' });
+      const mockResponse = { access_token: 'mock.jwt.token', refresh_token: 'mock.refresh.token' };
+      authService.signIn.mockResolvedValue(mockResponse);
 
       const result = await controller.signIn({
         userid: 'testuser',
         password: 'correctpassword',
       });
 
-      expect(result).toEqual({ access_token: 'mock.jwt.token' });
+      expect(result).toEqual(mockResponse);
     });
 
     it('잘못된 자격증명 → UnauthorizedException 전파', async () => {
