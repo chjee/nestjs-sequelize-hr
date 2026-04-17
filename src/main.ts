@@ -3,12 +3,17 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: ['error', 'warn', 'log', 'debug', 'verbose'],
-    cors: { origin: '*', methods: 'GET,HEAD,PUT,PATCH,POST,DELETE' },
+    cors: {
+      origin: process.env.ALLOWED_ORIGINS?.split(',') ?? ['http://localhost:3000'],
+      methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    },
   });
+  app.useGlobalFilters(new AllExceptionsFilter());
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
