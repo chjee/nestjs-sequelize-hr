@@ -21,6 +21,7 @@ const mockUser = (overrides: Record<string, unknown> = {}) => {
 const mockUserRepository = {
   findOne: jest.fn(),
   findAll: jest.fn(),
+  findAndCountAll: jest.fn(),
   create: jest.fn(),
   update: jest.fn(),
   destroy: jest.fn(),
@@ -61,11 +62,12 @@ describe('UsersService', () => {
   });
 
   describe('findAll', () => {
-    it('전체 사용자 목록 반환', async () => {
+    it('페이지네이션된 사용자 목록 반환', async () => {
       const users = [mockUser(), mockUser({ id: 2, userid: 'admin' })];
-      mockUserRepository.findAll.mockResolvedValue(users);
-      const result = await service.findAll();
-      expect(result).toHaveLength(2);
+      mockUserRepository.findAndCountAll.mockResolvedValue({ rows: users, count: 2 });
+      const result = await service.findAll(1, 20);
+      expect(result.data).toHaveLength(2);
+      expect(result.total).toBe(2);
     });
   });
 

@@ -3,20 +3,26 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   ParseIntPipe,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiBody,
+  ApiCreatedResponse,
+  ApiNoContentResponse,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { PaginationDto } from '../common/dto/pagination.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
@@ -29,9 +35,10 @@ export class UsersController {
 
   @ApiBearerAuth('access_token')
   @Post()
+  @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'User Create API', description: 'Create a user' })
   @ApiBody({ type: CreateUserDto })
-  @ApiOkResponse({ type: CreateUserDto })
+  @ApiCreatedResponse({ type: CreateUserDto })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async create(@Body() createUserDto: CreateUserDto): Promise<User> {
     return this.usersService.create(createUserDto);
@@ -39,11 +46,12 @@ export class UsersController {
 
   @ApiBearerAuth('access_token')
   @Get()
-  @ApiOperation({ summary: 'User List API', description: 'Get all users' })
-  @ApiOkResponse({ type: [CreateUserDto] })
+  @ApiOperation({ summary: 'User List API', description: 'Get all users (paginated)' })
+  @ApiOkResponse({ schema: { example: { data: [], total: 0 } } })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  async findAll(): Promise<User[]> {
-    return this.usersService.findAll();
+  async findAll(@Query() paginationDto: PaginationDto): Promise<{ data: User[]; total: number }> {
+    const { page, limit } = paginationDto;
+    return this.usersService.findAll(page, limit);
   }
 
   @ApiBearerAuth('access_token')
@@ -71,8 +79,10 @@ export class UsersController {
 
   @ApiBearerAuth('access_token')
   @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'User Delete API', description: 'Delete a user by id' })
   @ApiParam({ name: 'id', type: Number, example: 1 })
+  @ApiNoContentResponse({ description: 'Deleted successfully' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     return this.usersService.remove(id);

@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { Department } from './entities/department.entity';
 import { CreateDepartmentDto } from './dto/create-department.dto';
 import { UpdateDepartmentDto } from './dto/update-department.dto';
@@ -13,7 +13,14 @@ export class DepartmentsService {
   ) {}
 
   async create(createDepartmentDto: CreateDepartmentDto): Promise<Department> {
-    return this.departmentRepository.create<Department>(createDepartmentDto);
+    try {
+      return await this.departmentRepository.create<Department>(createDepartmentDto);
+    } catch (error) {
+      if (error instanceof Error && error.name === 'SequelizeForeignKeyConstraintError') {
+        throw new BadRequestException('Invalid manager_id or location_id');
+      }
+      throw error;
+    }
   }
 
   async findAll(page = 1, limit = 20): Promise<{ data: Department[]; total: number }> {
