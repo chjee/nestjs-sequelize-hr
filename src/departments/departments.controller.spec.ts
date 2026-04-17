@@ -37,7 +37,11 @@ describe('DepartmentsController', () => {
 
   describe('create', () => {
     it('부서 생성 → 생성된 부서 반환', async () => {
-      const dto = { department_name: 'Finance', manager_id: 200, location_id: 1700 };
+      const dto = {
+        department_name: 'Finance',
+        manager_id: 200,
+        location_id: 1700,
+      };
       mockService.create.mockResolvedValue(mockDepartment);
       const result = await controller.create(dto as any);
       expect(result).toEqual(mockDepartment);
@@ -79,9 +83,13 @@ describe('DepartmentsController', () => {
     it('부서 정보 수정', async () => {
       const updated = { ...mockDepartment, department_name: 'Updated Finance' };
       mockService.update.mockResolvedValue(updated);
-      const result = await controller.update(10, { department_name: 'Updated Finance' } as any);
+      const result = await controller.update(10, {
+        department_name: 'Updated Finance',
+      } as any);
       expect(result).toEqual(updated);
-      expect(mockService.update).toHaveBeenCalledWith(10, { department_name: 'Updated Finance' });
+      expect(mockService.update).toHaveBeenCalledWith(10, {
+        department_name: 'Updated Finance',
+      });
     });
   });
 

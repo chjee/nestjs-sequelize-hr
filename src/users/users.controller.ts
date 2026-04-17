@@ -46,10 +46,15 @@ export class UsersController {
 
   @ApiBearerAuth('access_token')
   @Get()
-  @ApiOperation({ summary: 'User List API', description: 'Get all users (paginated)' })
+  @ApiOperation({
+    summary: 'User List API',
+    description: 'Get all users (paginated)',
+  })
   @ApiOkResponse({ schema: { example: { data: [], total: 0 } } })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  async findAll(@Query() paginationDto: PaginationDto): Promise<{ data: User[]; total: number }> {
+  async findAll(
+    @Query() paginationDto: PaginationDto,
+  ): Promise<{ data: User[]; total: number }> {
     const { page, limit } = paginationDto;
     return this.usersService.findAll(page, limit);
   }
@@ -66,7 +71,10 @@ export class UsersController {
 
   @ApiBearerAuth('access_token')
   @Patch(':id')
-  @ApiOperation({ summary: 'User Update API', description: 'Update a user by id' })
+  @ApiOperation({
+    summary: 'User Update API',
+    description: 'Update a user by id',
+  })
   @ApiParam({ name: 'id', type: Number, example: 1 })
   @ApiBody({ type: UpdateUserDto })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
@@ -80,7 +88,10 @@ export class UsersController {
   @ApiBearerAuth('access_token')
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: 'User Delete API', description: 'Delete a user by id' })
+  @ApiOperation({
+    summary: 'User Delete API',
+    description: 'Delete a user by id',
+  })
   @ApiParam({ name: 'id', type: Number, example: 1 })
   @ApiNoContentResponse({ description: 'Deleted successfully' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })

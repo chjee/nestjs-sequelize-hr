@@ -1,4 +1,9 @@
-import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Department } from './entities/department.entity';
 import { CreateDepartmentDto } from './dto/create-department.dto';
 import { UpdateDepartmentDto } from './dto/update-department.dto';
@@ -14,16 +19,24 @@ export class DepartmentsService {
 
   async create(createDepartmentDto: CreateDepartmentDto): Promise<Department> {
     try {
-      return await this.departmentRepository.create<Department>(createDepartmentDto);
+      return await this.departmentRepository.create<Department>(
+        createDepartmentDto,
+      );
     } catch (error) {
-      if (error instanceof Error && error.name === 'SequelizeForeignKeyConstraintError') {
+      if (
+        error instanceof Error &&
+        error.name === 'SequelizeForeignKeyConstraintError'
+      ) {
         throw new BadRequestException('Invalid manager_id or location_id');
       }
       throw error;
     }
   }
 
-  async findAll(page = 1, limit = 20): Promise<{ data: Department[]; total: number }> {
+  async findAll(
+    page = 1,
+    limit = 20,
+  ): Promise<{ data: Department[]; total: number }> {
     const { rows, count } = await this.departmentRepository.findAndCountAll({
       limit,
       offset: (page - 1) * limit,
@@ -43,7 +56,10 @@ export class DepartmentsService {
     return department;
   }
 
-  async update(id: number, updateDepartmentDto: UpdateDepartmentDto): Promise<Department> {
+  async update(
+    id: number,
+    updateDepartmentDto: UpdateDepartmentDto,
+  ): Promise<Department> {
     const [affectedCount] = await this.departmentRepository.update(
       updateDepartmentDto,
       { where: { department_id: id } },

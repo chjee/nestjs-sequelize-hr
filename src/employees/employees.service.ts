@@ -1,4 +1,9 @@
-import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { Employee } from './entities/employee.entity';
@@ -16,14 +21,22 @@ export class EmployeesService {
     try {
       return await this.employeeRepository.create<Employee>(createEmployeeDto);
     } catch (error) {
-      if (error instanceof Error && error.name === 'SequelizeForeignKeyConstraintError') {
-        throw new BadRequestException('Invalid job_id, manager_id, or department_id');
+      if (
+        error instanceof Error &&
+        error.name === 'SequelizeForeignKeyConstraintError'
+      ) {
+        throw new BadRequestException(
+          'Invalid job_id, manager_id, or department_id',
+        );
       }
       throw error;
     }
   }
 
-  async findAll(page = 1, limit = 20): Promise<{ data: Employee[]; total: number }> {
+  async findAll(
+    page = 1,
+    limit = 20,
+  ): Promise<{ data: Employee[]; total: number }> {
     const { rows, count } = await this.employeeRepository.findAndCountAll({
       limit,
       offset: (page - 1) * limit,
@@ -43,7 +56,10 @@ export class EmployeesService {
     return employee;
   }
 
-  async update(id: number, updateEmployeeDto: UpdateEmployeeDto): Promise<Employee> {
+  async update(
+    id: number,
+    updateEmployeeDto: UpdateEmployeeDto,
+  ): Promise<Employee> {
     const [affectedCount] = await this.employeeRepository.update(
       updateEmployeeDto,
       { where: { employee_id: id } },

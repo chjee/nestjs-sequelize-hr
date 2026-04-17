@@ -29,7 +29,10 @@ export class AuthService {
 
   async signIn(signInUserDto: SignInUserDto): Promise<TokenResponse> {
     const user = await this.usersService.findOne(signInUserDto.userid);
-    if (!user || !(await bcrypt.compare(signInUserDto.password, user.password))) {
+    if (
+      !user ||
+      !(await bcrypt.compare(signInUserDto.password, user.password))
+    ) {
       throw new UnauthorizedException();
     }
     const payload = { userId: user.userid, userName: user.username };
@@ -40,7 +43,9 @@ export class AuthService {
 
   async refresh(token: string): Promise<{ access_token: string }> {
     const tokenHash = this.hashToken(token);
-    const record = await this.refreshTokenRepository.findOne({ where: { token: tokenHash } });
+    const record = await this.refreshTokenRepository.findOne({
+      where: { token: tokenHash },
+    });
     if (!record || record.expires_at < new Date()) {
       if (record) await record.destroy();
       throw new UnauthorizedException('Refresh token expired or invalid');
@@ -60,7 +65,11 @@ export class AuthService {
     const token = crypto.randomBytes(40).toString('hex');
     const tokenHash = this.hashToken(token);
     const expires_at = new Date(Date.now() + this.refreshTokenTtlMs);
-    await this.refreshTokenRepository.create({ user_id: userId, token: tokenHash, expires_at } as RefreshToken);
+    await this.refreshTokenRepository.create({
+      user_id: userId,
+      token: tokenHash,
+      expires_at,
+    } as RefreshToken);
     return token;
   }
 
