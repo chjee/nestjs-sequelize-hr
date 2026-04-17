@@ -3,8 +3,13 @@ import { UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
+import * as crypto from 'crypto';
 import { AuthService } from './auth.service';
 import { UsersService } from '../users/users.service';
+
+function hashToken(token: string): string {
+  return crypto.createHash('sha256').update(token).digest('hex');
+}
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -100,19 +105,23 @@ describe('AuthService', () => {
     it('유효한 refresh token → 새 access_token 반환', async () => {
       mockRefreshTokenRepo.findOne.mockResolvedValue({
         user_id: 1,
-        token: 'valid-token',
+        token: hashToken('valid-token'),
         expires_at: new Date(Date.now() + 1000 * 60 * 60),
       });
       usersService.findById.mockResolvedValue(mockUser);
 
       const result = await service.refresh('valid-token');
       expect(result.access_token).toBe('mock.jwt.token');
+      // findOne이 hash된 token으로 조회되는지 확인
+      expect(mockRefreshTokenRepo.findOne).toHaveBeenCalledWith({
+        where: { token: hashToken('valid-token') },
+      });
     });
 
     it('만료된 refresh token → UnauthorizedException', async () => {
       mockRefreshTokenRepo.findOne.mockResolvedValue({
         user_id: 1,
-        token: 'expired-token',
+        token: hashToken('expired-token'),
         expires_at: new Date(Date.now() - 1000),
         destroy: jest.fn(),
       });
@@ -127,9 +136,12 @@ describe('AuthService', () => {
   });
 
   describe('logout', () => {
-    it('refresh token 삭제', async () => {
-      await service.logout('some-token');
-      expect(mockRefreshTokenRepo.destroy).toHaveBeenCalledWith({ where: { token: 'some-token' } });
+    it('refresh token 해시화 후 삭제', async () => {
+      const token = 'some-token';
+      await service.logout(token);
+      const calledWith = mockRefreshTokenRepo.destroy.mock.calls[0][0];
+      expect(calledWith.where.token).not.toBe(token); // plain text가 아닌 hash 저장
+      expect(calledWith.where.token).toHaveLength(64); // sha256 hex = 64 chars
     });
   });
 });
