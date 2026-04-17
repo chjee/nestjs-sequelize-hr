@@ -6,6 +6,8 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { AuthGuard } from './auth/auth.guard';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { DatabaseModule } from './database/database.module';
+import { HealthModule } from './health/health.module';
 import * as Joi from 'joi';
 
 @Module({
@@ -22,11 +24,14 @@ import * as Joi from 'joi';
         DB_NAME: Joi.string().required(),
         PORT: Joi.number().default(3000),
         ALLOWED_ORIGINS: Joi.string().optional(),
+        REFRESH_TOKEN_TTL_DAYS: Joi.number().default(7),
       }),
     }),
     ThrottlerModule.forRoot({
       throttlers: [{ ttl: 60000, limit: 10 }],
     }),
+    DatabaseModule,
+    HealthModule,
     UsersModule,
     AuthModule,
     DepartmentsModule,
