@@ -50,10 +50,15 @@ export class AuthController {
   @Public()
   @HttpCode(HttpStatus.OK)
   @Post('refresh')
-  @ApiOperation({ summary: 'Token Refresh API', description: 'Issue new access token using refresh token' })
+  @ApiOperation({
+    summary: 'Token Refresh API',
+    description: 'Issue new access token using refresh token',
+  })
   @ApiBody({ schema: { example: { refresh_token: 'a1b2c3d4e5f6...' } } })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  async refresh(@Body('refresh_token') token: string): Promise<{ access_token: string }> {
+  async refresh(
+    @Body('refresh_token') token: string,
+  ): Promise<{ access_token: string }> {
     return this.authService.refresh(token);
   }
 
@@ -62,7 +67,10 @@ export class AuthController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('logout')
   @ApiBearerAuth('access_token')
-  @ApiOperation({ summary: 'User Logout API', description: 'Invalidate refresh token' })
+  @ApiOperation({
+    summary: 'User Logout API',
+    description: 'Invalidate refresh token',
+  })
   @ApiBody({ schema: { example: { refresh_token: 'a1b2c3d4e5f6...' } } })
   async logout(@Body('refresh_token') token: string): Promise<void> {
     return this.authService.logout(token);
@@ -70,7 +78,10 @@ export class AuthController {
 
   @ApiBearerAuth('access_token')
   @Get('profile')
-  @ApiOperation({ summary: 'User Profile API', description: 'Get user profile' })
+  @ApiOperation({
+    summary: 'User Profile API',
+    description: 'Get user profile',
+  })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async getProfile(@Request() req): Promise<any> {
     return req.user;

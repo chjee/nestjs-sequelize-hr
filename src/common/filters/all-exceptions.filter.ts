@@ -34,7 +34,8 @@ export class AllExceptionsFilter implements ExceptionFilter {
         method: request.method,
         path: request.url,
         statusCode: status,
-        error: exception instanceof Error ? exception.message : String(exception),
+        error:
+          exception instanceof Error ? exception.message : String(exception),
         timestamp: new Date().toISOString(),
       });
     }

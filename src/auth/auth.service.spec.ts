@@ -126,12 +126,16 @@ describe('AuthService', () => {
         destroy: jest.fn(),
       });
 
-      await expect(service.refresh('expired-token')).rejects.toThrow(UnauthorizedException);
+      await expect(service.refresh('expired-token')).rejects.toThrow(
+        UnauthorizedException,
+      );
     });
 
     it('없는 token → UnauthorizedException', async () => {
       mockRefreshTokenRepo.findOne.mockResolvedValue(null);
-      await expect(service.refresh('no-token')).rejects.toThrow(UnauthorizedException);
+      await expect(service.refresh('no-token')).rejects.toThrow(
+        UnauthorizedException,
+      );
     });
   });
 
