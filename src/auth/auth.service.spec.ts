@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import { AuthService } from './auth.service';
 import { UsersService } from '../users/users.service';
@@ -13,12 +14,20 @@ describe('AuthService', () => {
   const hashedPassword = bcrypt.hashSync('correctpassword', 10);
 
   const mockUser = {
+    id: 1,
     userid: 'testuser',
     username: 'Test User',
     password: hashedPassword,
   } as any;
 
+  const mockRefreshTokenRepo = {
+    create: jest.fn().mockResolvedValue({}),
+    findOne: jest.fn(),
+    destroy: jest.fn().mockResolvedValue(1),
+  };
+
   beforeEach(async () => {
+    jest.clearAllMocks();
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AuthService,
@@ -26,6 +35,7 @@ describe('AuthService', () => {
           provide: UsersService,
           useValue: {
             findOne: jest.fn(),
+            findById: jest.fn(),
           },
         },
         {
@@ -33,6 +43,14 @@ describe('AuthService', () => {
           useValue: {
             signAsync: jest.fn().mockResolvedValue('mock.jwt.token'),
           },
+        },
+        {
+          provide: ConfigService,
+          useValue: { get: jest.fn().mockReturnValue(7) },
+        },
+        {
+          provide: 'REFRESH_TOKEN_REPOSITORY',
+          useValue: mockRefreshTokenRepo,
         },
       ],
     }).compile();
@@ -47,7 +65,7 @@ describe('AuthService', () => {
   });
 
   describe('signIn', () => {
-    it('올바른 자격증명 → access_token 반환', async () => {
+    it('올바른 자격증명 → access_token + refresh_token 반환', async () => {
       usersService.findOne.mockResolvedValue(mockUser);
 
       const result = await service.signIn({
@@ -55,7 +73,8 @@ describe('AuthService', () => {
         password: 'correctpassword',
       });
 
-      expect(result).toEqual({ access_token: 'mock.jwt.token' });
+      expect(result.access_token).toBe('mock.jwt.token');
+      expect(result.refresh_token).toBeDefined();
       expect(jwtService.signAsync).toHaveBeenCalledWith({
         userId: mockUser.userid,
         userName: mockUser.username,
@@ -64,7 +83,6 @@ describe('AuthService', () => {
 
     it('잘못된 비밀번호 → UnauthorizedException', async () => {
       usersService.findOne.mockResolvedValue(mockUser);
-
       await expect(
         service.signIn({ userid: 'testuser', password: 'wrongpassword' }),
       ).rejects.toThrow(UnauthorizedException);
@@ -72,10 +90,46 @@ describe('AuthService', () => {
 
     it('존재하지 않는 userid → UnauthorizedException', async () => {
       usersService.findOne.mockResolvedValue(undefined);
-
       await expect(
         service.signIn({ userid: 'nobody', password: 'anypassword' }),
       ).rejects.toThrow(UnauthorizedException);
+    });
+  });
+
+  describe('refresh', () => {
+    it('유효한 refresh token → 새 access_token 반환', async () => {
+      mockRefreshTokenRepo.findOne.mockResolvedValue({
+        user_id: 1,
+        token: 'valid-token',
+        expires_at: new Date(Date.now() + 1000 * 60 * 60),
+      });
+      usersService.findById.mockResolvedValue(mockUser);
+
+      const result = await service.refresh('valid-token');
+      expect(result.access_token).toBe('mock.jwt.token');
+    });
+
+    it('만료된 refresh token → UnauthorizedException', async () => {
+      mockRefreshTokenRepo.findOne.mockResolvedValue({
+        user_id: 1,
+        token: 'expired-token',
+        expires_at: new Date(Date.now() - 1000),
+        destroy: jest.fn(),
+      });
+
+      await expect(service.refresh('expired-token')).rejects.toThrow(UnauthorizedException);
+    });
+
+    it('없는 token → UnauthorizedException', async () => {
+      mockRefreshTokenRepo.findOne.mockResolvedValue(null);
+      await expect(service.refresh('no-token')).rejects.toThrow(UnauthorizedException);
+    });
+  });
+
+  describe('logout', () => {
+    it('refresh token 삭제', async () => {
+      await service.logout('some-token');
+      expect(mockRefreshTokenRepo.destroy).toHaveBeenCalledWith({ where: { token: 'some-token' } });
     });
   });
 });

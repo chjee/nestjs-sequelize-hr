@@ -1,13 +1,13 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, HttpAdapterHost } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 
 async function bootstrap() {
+  const logger = new Logger('Bootstrap');
   const app = await NestFactory.create(AppModule, {
-    logger: ['error', 'warn', 'log', 'debug', 'verbose'],
     cors: {
       origin: process.env.ALLOWED_ORIGINS?.split(',') ?? ['http://localhost:3000'],
       methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
@@ -46,9 +46,9 @@ async function bootstrap() {
     },
   });
 
-  const configSerivce = app.get(ConfigService);
-  const listenPort = configSerivce.get<number>('PORT', 3000);
+  const configService = app.get(ConfigService);
+  const listenPort = configService.get<number>('PORT', 3000);
   await app.listen(listenPort);
-  console.log(`Application is running on: ${await app.getUrl()}`);
+  logger.log(`Application is running on: ${await app.getUrl()}`);
 }
 bootstrap();
