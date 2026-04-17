@@ -16,7 +16,7 @@ describe('AuthService', () => {
     userid: 'testuser',
     username: 'Test User',
     password: hashedPassword,
-  };
+  } as any;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({

@@ -7,7 +7,9 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  Query,
 } from '@nestjs/common';
+import { PaginationDto } from '../common/dto/pagination.dto';
 import { DepartmentsService } from './departments.service';
 import { CreateDepartmentDto } from './dto/create-department.dto';
 import { UpdateDepartmentDto } from './dto/update-department.dto';
@@ -55,12 +57,19 @@ export class DepartmentsController {
   @Get()
   @ApiOperation({
     summary: 'Department List API',
-    description: 'Get all departments',
+    description: 'Get all departments with pagination',
   })
-  @ApiOkResponse({ type: [CreateDepartmentDto] })
+  @ApiOkResponse({
+    schema: {
+      example: { data: [], total: 27 },
+    },
+  })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  async findAll(): Promise<Department[]> {
-    return this.departmentsService.findAll();
+  async findAll(
+    @Query() paginationDto: PaginationDto,
+  ): Promise<{ data: Department[]; total: number }> {
+    const { page = 1, limit = 20 } = paginationDto;
+    return this.departmentsService.findAll(page, limit);
   }
 
   @ApiBearerAuth('access_token')

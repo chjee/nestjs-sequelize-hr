@@ -6,6 +6,7 @@ import { Country } from '../departments/entities/country.entity';
 import { Region } from '../departments/entities/region.entity';
 import { Job } from '../employees/entities/job.entity';
 import { JobHistory } from '../employees/entities/jobhistory.entity';
+import { User } from '../users/entities/user.entity';
 import configDatabase from '../config/config.database';
 
 export const databaseProviders = [
@@ -21,6 +22,7 @@ export const databaseProviders = [
         Region,
         Job,
         JobHistory,
+        User,
       ]);
       if (process.env.DB_SYNC === 'true') {
         await sequelize.sync();
