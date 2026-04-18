@@ -130,7 +130,7 @@ export class EmployeesController {
   async update(
     @Param('id', new ParseIntPipe()) id: number,
     @Body() updateEmployeeDto: UpdateEmployeeDto,
-  ): Promise<any> {
+  ): Promise<Employee> {
     return this.employeesService.update(+id, updateEmployeeDto);
   }
 
@@ -147,7 +147,7 @@ export class EmployeesController {
     example: 207,
   })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  async remove(@Param('id', new ParseIntPipe()) id: number): Promise<any> {
+  async remove(@Param('id', new ParseIntPipe()) id: number): Promise<void> {
     return this.employeesService.remove(+id);
   }
 }
