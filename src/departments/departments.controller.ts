@@ -8,6 +8,8 @@ import {
   Delete,
   ParseIntPipe,
   Query,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { PaginationDto } from '../common/dto/pagination.dto';
 import { DepartmentsService } from './departments.service';
@@ -17,6 +19,7 @@ import { Department } from './entities/department.entity';
 import {
   ApiBearerAuth,
   ApiBody,
+  ApiCreatedResponse,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
@@ -31,12 +34,13 @@ export class DepartmentsController {
 
   @ApiBearerAuth('access_token')
   @Post()
+  @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
     summary: 'Department Create API',
     description: 'Create a department',
   })
   @ApiBody({ type: CreateDepartmentDto })
-  @ApiOkResponse({
+  @ApiCreatedResponse({
     schema: {
       example: {
         department_id: 11,
