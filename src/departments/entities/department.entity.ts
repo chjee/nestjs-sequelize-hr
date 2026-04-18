@@ -12,7 +12,7 @@ import {
 import { Employee } from '../../employees/entities/employee.entity';
 import { Location } from './location.entity';
 
-@Table({ tableName: 'departments' })
+@Table({ tableName: 'departments', timestamps: true })
 export class Department extends Model<Department> {
   @PrimaryKey
   @AllowNull(false)

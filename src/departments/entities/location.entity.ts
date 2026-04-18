@@ -12,7 +12,7 @@ import {
 } from 'sequelize-typescript';
 import { Country } from './country.entity';
 
-@Table({ tableName: 'locations' })
+@Table({ tableName: 'locations', timestamps: true })
 export class Location extends Model<Location> {
   @PrimaryKey
   @AutoIncrement

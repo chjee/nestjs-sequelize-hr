@@ -46,7 +46,7 @@ export class AuthService {
     return { access_token, refresh_token };
   }
 
-  async refresh(token: string): Promise<{ access_token: string }> {
+  async refresh(token: string): Promise<TokenResponse> {
     const tokenHash = this.hashToken(token);
     const record = await this.refreshTokenRepository.findOne({
       where: { token: tokenHash },
@@ -58,7 +58,10 @@ export class AuthService {
 
     const user = await this.usersService.findById(record.user_id);
     const payload = { userId: user.userid, userName: user.username };
-    return { access_token: await this.jwtService.signAsync(payload) };
+    const access_token = await this.jwtService.signAsync(payload);
+    await record.destroy();
+    const refresh_token = await this.createRefreshToken(record.user_id);
+    return { access_token, refresh_token };
   }
 
   async logout(token: string): Promise<void> {

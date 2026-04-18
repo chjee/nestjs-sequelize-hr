@@ -11,7 +11,7 @@ import {
 } from 'sequelize-typescript';
 import { Region } from './region.entity';
 
-@Table({ tableName: 'countries' })
+@Table({ tableName: 'countries', timestamps: true })
 export class Country extends Model<Country> {
   @PrimaryKey
   @AllowNull(false)

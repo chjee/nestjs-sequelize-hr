@@ -2,17 +2,35 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Sequelize } from 'sequelize-typescript';
 import * as request from 'supertest';
-import { AppModule } from './../src/app.module';
+import { configureE2eEnvironment, createE2eProviderMocks } from './e2e-testing';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
+  let sequelize: { close: jest.Mock };
 
   beforeEach(async () => {
+    configureE2eEnvironment();
+    const { AppModule } = await import('./../src/app.module');
+    const providerMocks = createE2eProviderMocks();
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
-    }).compile();
+    })
+      .overrideProvider('SEQUELIZE')
+      .useValue(providerMocks.sequelize)
+      .overrideProvider('USER_REPOSITORY')
+      .useValue(providerMocks.userRepository)
+      .overrideProvider('REFRESH_TOKEN_REPOSITORY')
+      .useValue(providerMocks.refreshTokenRepository)
+      .overrideProvider('EMPLOYEE_REPOSITORY')
+      .useValue(providerMocks.employeeRepository)
+      .overrideProvider('DEPARTMENT_REPOSITORY')
+      .useValue(providerMocks.departmentRepository)
+      .overrideProvider('AUDIT_LOG_REPOSITORY')
+      .useValue(providerMocks.auditLogRepository)
+      .compile();
 
     app = moduleFixture.createNestApplication();
+    sequelize = app.get('SEQUELIZE');
     app.useGlobalPipes(
       new ValidationPipe({
         whitelist: true,
@@ -24,8 +42,11 @@ describe('AppController (e2e)', () => {
   });
 
   afterEach(async () => {
-    await app.get<Sequelize>('SEQUELIZE').close();
-    await app.close();
+    if (app) {
+      await app.get<Sequelize>('SEQUELIZE').close();
+      await app.close();
+    }
+    expect(sequelize.close).toHaveBeenCalled();
   });
 
   it('/ (GET)', () => {
@@ -51,7 +72,7 @@ describe('AppController (e2e)', () => {
       it('잘못된 자격증명 → 401', () => {
         return request(app.getHttpServer())
           .post('/auth/login')
-          .send({ userid: 'wronguser', password: 'wrongpass' })
+          .send({ userid: 'wronguser', password: 'Wrongpass1@' })
           .expect(401);
       });
 
@@ -70,6 +91,13 @@ describe('AppController (e2e)', () => {
           .send({ refresh_token: 'invalid-token' })
           .expect(401);
       });
+
+      it('refresh token 누락 → 400', () => {
+        return request(app.getHttpServer())
+          .post('/auth/refresh')
+          .send({})
+          .expect(400);
+      });
     });
 
     describe('Protected routes', () => {
@@ -81,12 +109,12 @@ describe('AppController (e2e)', () => {
         return request(app.getHttpServer()).get('/users').expect(401);
       });
 
-      it('토큰 없이 /employee 접근 → 401', () => {
-        return request(app.getHttpServer()).get('/employee').expect(401);
+      it('토큰 없이 /employees 접근 → 401', () => {
+        return request(app.getHttpServer()).get('/employees').expect(401);
       });
 
-      it('토큰 없이 /department 접근 → 401', () => {
-        return request(app.getHttpServer()).get('/department').expect(401);
+      it('토큰 없이 /departments 접근 → 401', () => {
+        return request(app.getHttpServer()).get('/departments').expect(401);
       });
     });
   });
