@@ -10,6 +10,9 @@ export const up = async ({ context: qi }) => {
     user_id: {
       type: DataTypes.INTEGER.UNSIGNED,
       allowNull: false,
+      references: { model: 'users', key: 'id' },
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
     },
     token: {
       type: DataTypes.STRING(255),
@@ -29,6 +32,7 @@ export const up = async ({ context: qi }) => {
       allowNull: false,
     },
   });
+  await qi.addIndex('refresh_tokens', ['user_id']);
 };
 
 export const down = async ({ context: qi }) => {
