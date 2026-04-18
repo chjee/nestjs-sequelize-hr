@@ -17,6 +17,7 @@ import {
   ApiBody,
   ApiBearerAuth,
   ApiCreatedResponse,
+  ApiOkResponse,
   ApiOperation,
   ApiTags,
   ApiUnauthorizedResponse,
@@ -56,10 +57,18 @@ export class AuthController {
     description: 'Issue new access token using refresh token',
   })
   @ApiBody({ type: RefreshTokenDto })
+  @ApiOkResponse({
+    schema: {
+      example: {
+        access_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+        refresh_token: 'a1b2c3d4e5f6...',
+      },
+    },
+  })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async refresh(
     @Body() refreshTokenDto: RefreshTokenDto,
-  ): Promise<{ access_token: string }> {
+  ): Promise<TokenResponse> {
     return this.authService.refresh(refreshTokenDto.refresh_token);
   }
 

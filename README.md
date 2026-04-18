@@ -49,6 +49,8 @@ npm run start:prod
 
 Swagger 문서는 실행 후 `/api-docs`에서 확인할 수 있습니다.
 
+`POST /auth/refresh`는 새 access token과 refresh token을 함께 반환하며, 사용된 refresh token은 폐기됩니다.
+
 ## Test and Quality
 
 ```sh

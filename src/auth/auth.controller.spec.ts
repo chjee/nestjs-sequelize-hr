@@ -60,14 +60,20 @@ describe('AuthController', () => {
   });
 
   describe('refresh', () => {
-    it('refresh_token으로 새 access_token 반환', async () => {
-      authService.refresh.mockResolvedValue({ access_token: 'new.jwt.token' });
+    it('refresh_token으로 새 access_token + refresh_token 반환', async () => {
+      authService.refresh.mockResolvedValue({
+        access_token: 'new.jwt.token',
+        refresh_token: 'new.refresh.token',
+      });
 
       const result = await controller.refresh({
         refresh_token: 'mock.refresh.token',
       });
 
-      expect(result).toEqual({ access_token: 'new.jwt.token' });
+      expect(result).toEqual({
+        access_token: 'new.jwt.token',
+        refresh_token: 'new.refresh.token',
+      });
       expect(authService.refresh).toHaveBeenCalledWith('mock.refresh.token');
     });
   });
