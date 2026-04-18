@@ -2,17 +2,35 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Sequelize } from 'sequelize-typescript';
 import * as request from 'supertest';
-import { AppModule } from './../src/app.module';
+import { configureE2eEnvironment, createE2eProviderMocks } from './e2e-testing';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
+  let sequelize: { close: jest.Mock };
 
   beforeEach(async () => {
+    configureE2eEnvironment();
+    const { AppModule } = await import('./../src/app.module');
+    const providerMocks = createE2eProviderMocks();
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
-    }).compile();
+    })
+      .overrideProvider('SEQUELIZE')
+      .useValue(providerMocks.sequelize)
+      .overrideProvider('USER_REPOSITORY')
+      .useValue(providerMocks.userRepository)
+      .overrideProvider('REFRESH_TOKEN_REPOSITORY')
+      .useValue(providerMocks.refreshTokenRepository)
+      .overrideProvider('EMPLOYEE_REPOSITORY')
+      .useValue(providerMocks.employeeRepository)
+      .overrideProvider('DEPARTMENT_REPOSITORY')
+      .useValue(providerMocks.departmentRepository)
+      .overrideProvider('AUDIT_LOG_REPOSITORY')
+      .useValue(providerMocks.auditLogRepository)
+      .compile();
 
     app = moduleFixture.createNestApplication();
+    sequelize = app.get('SEQUELIZE');
     app.useGlobalPipes(
       new ValidationPipe({
         whitelist: true,
@@ -24,8 +42,11 @@ describe('AppController (e2e)', () => {
   });
 
   afterEach(async () => {
-    await app.get<Sequelize>('SEQUELIZE').close();
-    await app.close();
+    if (app) {
+      await app.get<Sequelize>('SEQUELIZE').close();
+      await app.close();
+    }
+    expect(sequelize.close).toHaveBeenCalled();
   });
 
   it('/ (GET)', () => {

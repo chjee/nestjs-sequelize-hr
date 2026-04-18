@@ -61,3 +61,5 @@ npm audit --omit=dev
 ```
 
 `npm run lint`는 검사만 수행하고, 자동 수정은 `npm run lint:fix`로 분리되어 있습니다.
+
+`npm run test:e2e`는 실제 MySQL 연결 대신 테스트 provider를 사용하므로 로컬 개발 DB를 변경하지 않습니다.
