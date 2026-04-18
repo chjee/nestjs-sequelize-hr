@@ -13,6 +13,7 @@ import { AuthService, AuthPayload, TokenResponse } from './auth.service';
 import { SignInUserDto } from '../users/dto/signin-user.dto';
 import { Public } from './decorators/public.decorator';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { TokenResponseDto } from './dto/token-response.dto';
 import {
   ApiBody,
   ApiBearerAuth,
@@ -34,14 +35,7 @@ export class AuthController {
   @Post('login')
   @ApiOperation({ summary: 'User Login API', description: 'User login' })
   @ApiBody({ type: SignInUserDto })
-  @ApiCreatedResponse({
-    schema: {
-      example: {
-        access_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-        refresh_token: 'a1b2c3d4e5f6...',
-      },
-    },
-  })
+  @ApiCreatedResponse({ type: TokenResponseDto })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async signIn(@Body() signInUserDto: SignInUserDto): Promise<TokenResponse> {
     return this.authService.signIn(signInUserDto);
@@ -57,14 +51,7 @@ export class AuthController {
     description: 'Issue new access token using refresh token',
   })
   @ApiBody({ type: RefreshTokenDto })
-  @ApiOkResponse({
-    schema: {
-      example: {
-        access_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-        refresh_token: 'a1b2c3d4e5f6...',
-      },
-    },
-  })
+  @ApiOkResponse({ type: TokenResponseDto })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async refresh(
     @Body() refreshTokenDto: RefreshTokenDto,
