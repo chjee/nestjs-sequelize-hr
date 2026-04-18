@@ -29,7 +29,7 @@ export class Employee extends Model<Employee> {
   last_name: string;
 
   @AllowNull(false)
-  @Column(DataType.STRING(25))
+  @Column(DataType.STRING(255))
   email: string;
 
   @AllowNull(true)
