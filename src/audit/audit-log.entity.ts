@@ -2,7 +2,7 @@ import { Column, DataType, Model, Table } from 'sequelize-typescript';
 
 @Table({ tableName: 'audit_logs' })
 export class AuditLog extends Model {
-  @Column({ type: DataType.STRING(50), allowNull: true })
+  @Column({ type: DataType.STRING(20), allowNull: true })
   user_id: string;
 
   @Column({ type: DataType.STRING(10), allowNull: false })
