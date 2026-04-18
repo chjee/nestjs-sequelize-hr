@@ -118,7 +118,7 @@ export class DepartmentsController {
   async update(
     @Param('id', new ParseIntPipe()) id: number,
     @Body() updateDepartmentDto: UpdateDepartmentDto,
-  ): Promise<any> {
+  ): Promise<Department> {
     return this.departmentsService.update(+id, updateDepartmentDto);
   }
 
@@ -135,7 +135,7 @@ export class DepartmentsController {
     example: 11,
   })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  async remove(@Param('id', new ParseIntPipe()) id: number): Promise<any> {
+  async remove(@Param('id', new ParseIntPipe()) id: number): Promise<void> {
     return this.departmentsService.remove(+id);
   }
 }

@@ -9,7 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
-import { AuthService, TokenResponse } from './auth.service';
+import { AuthService, AuthPayload, TokenResponse } from './auth.service';
 import { SignInUserDto } from '../users/dto/signin-user.dto';
 import { Public } from './decorators/public.decorator';
 import {
@@ -83,7 +83,7 @@ export class AuthController {
     description: 'Get user profile',
   })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  async getProfile(@Request() req): Promise<any> {
+  async getProfile(@Request() req): Promise<AuthPayload> {
     return req.user;
   }
 }

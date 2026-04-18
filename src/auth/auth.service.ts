@@ -7,6 +7,11 @@ import { SignInUserDto } from '../users/dto/signin-user.dto';
 import { UsersService } from '../users/users.service';
 import { RefreshToken } from './entities/refresh-token.entity';
 
+export interface AuthPayload {
+  userId: string;
+  userName: string;
+}
+
 export interface TokenResponse {
   access_token: string;
   refresh_token: string;
