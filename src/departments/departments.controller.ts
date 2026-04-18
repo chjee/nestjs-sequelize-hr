@@ -8,6 +8,8 @@ import {
   Delete,
   ParseIntPipe,
   Query,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { PaginationDto } from '../common/dto/pagination.dto';
 import { DepartmentsService } from './departments.service';
@@ -17,6 +19,7 @@ import { Department } from './entities/department.entity';
 import {
   ApiBearerAuth,
   ApiBody,
+  ApiCreatedResponse,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
@@ -24,19 +27,20 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 
-@Controller('department')
+@Controller('departments')
 @ApiTags('Department API')
 export class DepartmentsController {
   constructor(private readonly departmentsService: DepartmentsService) {}
 
   @ApiBearerAuth('access_token')
   @Post()
+  @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
     summary: 'Department Create API',
     description: 'Create a department',
   })
   @ApiBody({ type: CreateDepartmentDto })
-  @ApiOkResponse({
+  @ApiCreatedResponse({
     schema: {
       example: {
         department_id: 11,
@@ -118,7 +122,7 @@ export class DepartmentsController {
   async update(
     @Param('id', new ParseIntPipe()) id: number,
     @Body() updateDepartmentDto: UpdateDepartmentDto,
-  ): Promise<any> {
+  ): Promise<Department> {
     return this.departmentsService.update(+id, updateDepartmentDto);
   }
 
@@ -135,7 +139,7 @@ export class DepartmentsController {
     example: 11,
   })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  async remove(@Param('id', new ParseIntPipe()) id: number): Promise<any> {
+  async remove(@Param('id', new ParseIntPipe()) id: number): Promise<void> {
     return this.departmentsService.remove(+id);
   }
 }

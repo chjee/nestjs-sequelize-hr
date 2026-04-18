@@ -23,10 +23,25 @@ export class AllExceptionsFilter implements ExceptionFilter {
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
 
-    const message =
+    const responseBody =
       exception instanceof HttpException
         ? exception.getResponse()
         : 'Internal server error';
+
+    let message: string;
+    let errors: string[] | undefined;
+
+    if (typeof responseBody === 'object' && responseBody !== null) {
+      const body = responseBody as Record<string, unknown>;
+      if (Array.isArray(body.message)) {
+        message = 'Validation failed';
+        errors = body.message as string[];
+      } else {
+        message = (body.message as string) ?? String(responseBody);
+      }
+    } else {
+      message = responseBody as string;
+    }
 
     if (status === HttpStatus.INTERNAL_SERVER_ERROR) {
       this.logger.error({
@@ -45,6 +60,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
       timestamp: new Date().toISOString(),
       path: request.url,
       message,
+      ...(errors && { errors }),
     });
   }
 }

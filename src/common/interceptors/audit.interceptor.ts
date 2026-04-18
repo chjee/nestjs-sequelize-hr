@@ -10,6 +10,17 @@ import { AuditService } from '../../audit/audit.service';
 import { REQUEST_ID_HEADER } from '../middleware/request-id.middleware';
 
 const WRITE_METHODS = new Set(['POST', 'PATCH', 'PUT', 'DELETE']);
+const SENSITIVE_FIELDS = new Set(['password', 'newPassword', 'currentPassword', 'confirmPassword']);
+
+function sanitizeBody(body: Record<string, unknown>): Record<string, unknown> {
+  const sanitized = { ...body };
+  for (const field of SENSITIVE_FIELDS) {
+    if (field in sanitized) {
+      sanitized[field] = '[REDACTED]';
+    }
+  }
+  return sanitized;
+}
 
 @Injectable()
 export class AuditInterceptor implements NestInterceptor {
@@ -24,7 +35,9 @@ export class AuditInterceptor implements NestInterceptor {
     }
 
     const user = (req as any).user;
-    const requestBody = req.body ? JSON.stringify(req.body) : undefined;
+    const requestBody = req.body
+      ? JSON.stringify(sanitizeBody(req.body as Record<string, unknown>))
+      : undefined;
 
     return next.handle().pipe(
       tap(() => {

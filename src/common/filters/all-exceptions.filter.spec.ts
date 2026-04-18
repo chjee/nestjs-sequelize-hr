@@ -100,4 +100,50 @@ describe('AllExceptionsFilter', () => {
       expect(new Date(jsonArg.timestamp).getTime()).not.toBeNaN();
     });
   });
+
+  describe('Validation 에러 처리', () => {
+    it('ValidationPipe 에러(message 배열) → errors 필드 포함', () => {
+      const exception = new HttpException(
+        {
+          statusCode: 400,
+          message: ['email must be an email', 'password is too short'],
+          error: 'Bad Request',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+      filter.catch(exception, mockHost);
+
+      expect(mockJson).toHaveBeenCalledWith(
+        expect.objectContaining({
+          statusCode: 400,
+          message: 'Validation failed',
+          errors: ['email must be an email', 'password is too short'],
+        }),
+      );
+    });
+
+    it('일반 HttpException(문자열 message) → errors 필드 없음', () => {
+      const exception = new HttpException('Not Found', HttpStatus.NOT_FOUND);
+      filter.catch(exception, mockHost);
+
+      const jsonArg = mockJson.mock.calls[0][0];
+      expect(jsonArg.errors).toBeUndefined();
+      expect(jsonArg.message).toBe('Not Found');
+    });
+
+    it('객체 message HttpException → message 문자열 추출', () => {
+      const exception = new HttpException(
+        { message: 'Conflict', statusCode: 409 },
+        HttpStatus.CONFLICT,
+      );
+      filter.catch(exception, mockHost);
+
+      expect(mockJson).toHaveBeenCalledWith(
+        expect.objectContaining({
+          statusCode: 409,
+          message: 'Conflict',
+        }),
+      );
+    });
+  });
 });

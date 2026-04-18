@@ -40,14 +40,27 @@ export class DepartmentsService {
     const { rows, count } = await this.departmentRepository.findAndCountAll({
       limit,
       offset: (page - 1) * limit,
-      include: [Employee, Location],
+      include: [
+        { model: Location },
+        {
+          model: Employee,
+          attributes: ['employee_id', 'first_name', 'last_name'],
+        },
+      ],
+      subQuery: false,
     });
     return { data: rows, total: count };
   }
 
   async findOne(id: number): Promise<Department> {
     const department = await this.departmentRepository.findOne<Department>({
-      include: [Employee, Location],
+      include: [
+        { model: Location },
+        {
+          model: Employee,
+          attributes: ['employee_id', 'first_name', 'last_name'],
+        },
+      ],
       where: { department_id: id },
     });
     if (!department) {

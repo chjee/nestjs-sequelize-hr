@@ -50,11 +50,11 @@ export class CreateEmployeeDto {
     description: 'Email',
     example: 'nobody@gmail.com',
     minLength: 2,
-    maxLength: 25,
+    maxLength: 255,
   })
   @IsNotEmpty()
   @IsEmail()
-  @Length(2, 25)
+  @Length(2, 255)
   readonly email: string;
 
   @ApiProperty({
