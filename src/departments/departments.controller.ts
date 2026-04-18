@@ -24,7 +24,7 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 
-@Controller('department')
+@Controller('departments')
 @ApiTags('Department API')
 export class DepartmentsController {
   constructor(private readonly departmentsService: DepartmentsService) {}
