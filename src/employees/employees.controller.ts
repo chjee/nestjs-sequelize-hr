@@ -8,6 +8,8 @@ import {
   Delete,
   ParseIntPipe,
   Query,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { PaginationDto } from '../common/dto/pagination.dto';
 import { EmployeesService } from './employees.service';
@@ -17,6 +19,7 @@ import { Employee } from './entities/employee.entity';
 import {
   ApiBearerAuth,
   ApiBody,
+  ApiCreatedResponse,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
@@ -31,12 +34,13 @@ export class EmployeesController {
 
   @ApiBearerAuth('access_token')
   @Post()
+  @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
     summary: 'Employee Create API',
     description: 'Create a employee',
   })
   @ApiBody({ type: CreateEmployeeDto })
-  @ApiOkResponse({
+  @ApiCreatedResponse({
     schema: {
       example: {
         employee_id: 207,
