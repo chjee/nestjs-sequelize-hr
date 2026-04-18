@@ -10,7 +10,7 @@ import {
 } from 'sequelize-typescript';
 import { User } from '../../users/entities/user.entity';
 
-@Table({ tableName: 'refresh_tokens' })
+@Table({ tableName: 'refresh_tokens', timestamps: true })
 export class RefreshToken extends Model<RefreshToken> {
   @PrimaryKey
   @AutoIncrement

@@ -102,16 +102,28 @@ describe('AuthService', () => {
   });
 
   describe('refresh', () => {
-    it('유효한 refresh token → 새 access_token 반환', async () => {
+    it('유효한 refresh token → 새 access_token + refresh_token 반환 및 기존 token 폐기', async () => {
+      const destroy = jest.fn().mockResolvedValue(undefined);
       mockRefreshTokenRepo.findOne.mockResolvedValue({
         user_id: 1,
         token: hashToken('valid-token'),
         expires_at: new Date(Date.now() + 1000 * 60 * 60),
+        destroy,
       });
       usersService.findById.mockResolvedValue(mockUser);
 
       const result = await service.refresh('valid-token');
       expect(result.access_token).toBe('mock.jwt.token');
+      expect(result.refresh_token).toBeDefined();
+      expect(result.refresh_token).not.toBe('valid-token');
+      expect(destroy).toHaveBeenCalled();
+      expect(mockRefreshTokenRepo.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          user_id: 1,
+          token: expect.any(String),
+          expires_at: expect.any(Date),
+        }),
+      );
       // findOne이 hash된 token으로 조회되는지 확인
       expect(mockRefreshTokenRepo.findOne).toHaveBeenCalledWith({
         where: { token: hashToken('valid-token') },

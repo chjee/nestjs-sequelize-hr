@@ -1,4 +1,7 @@
-import { RequestIdMiddleware, REQUEST_ID_HEADER } from './request-id.middleware';
+import {
+  RequestIdMiddleware,
+  REQUEST_ID_HEADER,
+} from './request-id.middleware';
 
 function makeReqRes(existingId?: string) {
   const req: any = { headers: {} };
@@ -59,6 +62,8 @@ describe('RequestIdMiddleware', () => {
     middleware.use(req1, res1, next1);
     middleware.use(req2, res2, next2);
 
-    expect(req1.headers[REQUEST_ID_HEADER]).not.toBe(req2.headers[REQUEST_ID_HEADER]);
+    expect(req1.headers[REQUEST_ID_HEADER]).not.toBe(
+      req2.headers[REQUEST_ID_HEADER],
+    );
   });
 });

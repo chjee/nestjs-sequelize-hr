@@ -1,5 +1,3 @@
-import { DataTypes } from 'sequelize';
-
 export const up = async ({ context: qi }) => {
   await qi.addIndex('employees', ['department_id']);
   await qi.addIndex('employees', ['manager_id']);

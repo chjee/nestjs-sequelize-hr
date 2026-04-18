@@ -7,7 +7,7 @@ import {
   DataType,
 } from 'sequelize-typescript';
 
-@Table({ tableName: 'jobs' })
+@Table({ tableName: 'jobs', timestamps: true })
 export class Job extends Model<Job> {
   @PrimaryKey
   @AllowNull(false)

@@ -24,10 +24,12 @@ describe('HealthController', () => {
   describe('check()', () => {
     it('DB 연결 성공 시 healthy 상태 반환', async () => {
       mockAuthenticate.mockResolvedValueOnce(undefined);
-      mockCheck.mockImplementationOnce(async (indicators: (() => Promise<any>)[]) => {
-        const result = await indicators[0]();
-        return { status: 'ok', info: result };
-      });
+      mockCheck.mockImplementationOnce(
+        async (indicators: (() => Promise<any>)[]) => {
+          const result = await indicators[0]();
+          return { status: 'ok', info: result };
+        },
+      );
 
       const result = await controller.check();
       expect(result.status).toBe('ok');
@@ -35,10 +37,12 @@ describe('HealthController', () => {
 
     it('DB 연결 실패 시 unhealthy 상태 반환', async () => {
       mockAuthenticate.mockRejectedValueOnce(new Error('Connection refused'));
-      mockCheck.mockImplementationOnce(async (indicators: (() => Promise<any>)[]) => {
-        const result = await indicators[0]();
-        return { status: 'error', info: result };
-      });
+      mockCheck.mockImplementationOnce(
+        async (indicators: (() => Promise<any>)[]) => {
+          const result = await indicators[0]();
+          return { status: 'error', info: result };
+        },
+      );
 
       const result = await controller.check();
       expect(result.status).toBe('error');

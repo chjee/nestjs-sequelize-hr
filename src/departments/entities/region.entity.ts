@@ -8,7 +8,7 @@ import {
   DataType,
 } from 'sequelize-typescript';
 
-@Table({ tableName: 'regions' })
+@Table({ tableName: 'regions', timestamps: true })
 export class Region extends Model<Region> {
   @PrimaryKey
   @AllowNull(false)
