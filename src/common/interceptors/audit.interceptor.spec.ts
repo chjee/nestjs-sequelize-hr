@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common';
 import { of } from 'rxjs';
 import { AuditInterceptor } from './audit.interceptor';
 
@@ -54,49 +55,57 @@ describe('AuditInterceptor', () => {
   describe('sanitizeBody - 민감 필드 마스킹', () => {
     it('password 필드를 [REDACTED]로 치환', (done) => {
       const body = { username: 'user1', password: 'secret123' };
-      interceptor.intercept(makeContext('POST', body), mockNext).subscribe(() => {
-        setTimeout(() => {
-          const logged = JSON.parse(mockLog.mock.calls[0][0].request_body);
-          expect(logged.password).toBe('[REDACTED]');
-          expect(logged.username).toBe('user1');
-          done();
-        }, 0);
-      });
+      interceptor
+        .intercept(makeContext('POST', body), mockNext)
+        .subscribe(() => {
+          setTimeout(() => {
+            const logged = JSON.parse(mockLog.mock.calls[0][0].request_body);
+            expect(logged.password).toBe('[REDACTED]');
+            expect(logged.username).toBe('user1');
+            done();
+          }, 0);
+        });
     });
 
     it('newPassword 필드를 [REDACTED]로 치환', (done) => {
       const body = { newPassword: 'newSecret!1', currentPassword: 'old!1' };
-      interceptor.intercept(makeContext('PATCH', body), mockNext).subscribe(() => {
-        setTimeout(() => {
-          const logged = JSON.parse(mockLog.mock.calls[0][0].request_body);
-          expect(logged.newPassword).toBe('[REDACTED]');
-          expect(logged.currentPassword).toBe('[REDACTED]');
-          done();
-        }, 0);
-      });
+      interceptor
+        .intercept(makeContext('PATCH', body), mockNext)
+        .subscribe(() => {
+          setTimeout(() => {
+            const logged = JSON.parse(mockLog.mock.calls[0][0].request_body);
+            expect(logged.newPassword).toBe('[REDACTED]');
+            expect(logged.currentPassword).toBe('[REDACTED]');
+            done();
+          }, 0);
+        });
     });
 
     it('confirmPassword 필드를 [REDACTED]로 치환', (done) => {
       const body = { password: 'abc', confirmPassword: 'abc' };
-      interceptor.intercept(makeContext('POST', body), mockNext).subscribe(() => {
-        setTimeout(() => {
-          const logged = JSON.parse(mockLog.mock.calls[0][0].request_body);
-          expect(logged.password).toBe('[REDACTED]');
-          expect(logged.confirmPassword).toBe('[REDACTED]');
-          done();
-        }, 0);
-      });
+      interceptor
+        .intercept(makeContext('POST', body), mockNext)
+        .subscribe(() => {
+          setTimeout(() => {
+            const logged = JSON.parse(mockLog.mock.calls[0][0].request_body);
+            expect(logged.password).toBe('[REDACTED]');
+            expect(logged.confirmPassword).toBe('[REDACTED]');
+            done();
+          }, 0);
+        });
     });
 
     it('민감 필드가 없는 body는 그대로 저장', (done) => {
       const body = { department_name: 'Engineering', location_id: 1 };
-      interceptor.intercept(makeContext('POST', body), mockNext).subscribe(() => {
-        setTimeout(() => {
-          const logged = JSON.parse(mockLog.mock.calls[0][0].request_body);
-          expect(logged).toEqual(body);
-          done();
-        }, 0);
-      });
+      interceptor
+        .intercept(makeContext('POST', body), mockNext)
+        .subscribe(() => {
+          setTimeout(() => {
+            const logged = JSON.parse(mockLog.mock.calls[0][0].request_body);
+            expect(logged).toEqual(body);
+            done();
+          }, 0);
+        });
     });
 
     it('body가 없으면 request_body는 undefined', (done) => {
@@ -131,12 +140,42 @@ describe('AuditInterceptor', () => {
     });
 
     it('인증되지 않은 요청은 user_id가 undefined', (done) => {
-      interceptor.intercept(makeContext('POST', { name: 'test' }), mockNext).subscribe(() => {
-        setTimeout(() => {
-          expect(mockLog.mock.calls[0][0].user_id).toBeUndefined();
-          done();
-        }, 0);
-      });
+      interceptor
+        .intercept(makeContext('POST', { name: 'test' }), mockNext)
+        .subscribe(() => {
+          setTimeout(() => {
+            expect(mockLog.mock.calls[0][0].user_id).toBeUndefined();
+            done();
+          }, 0);
+        });
+    });
+  });
+
+  describe('audit 저장 실패', () => {
+    it('요청 흐름은 유지하고 실패 원인을 로깅', (done) => {
+      const loggerSpy = jest
+        .spyOn(Logger.prototype, 'error')
+        .mockImplementation();
+      mockLog.mockRejectedValueOnce(new Error('audit db down'));
+
+      interceptor
+        .intercept(makeContext('POST', { name: 'test' }), mockNext)
+        .subscribe({
+          next: () => {
+            setTimeout(() => {
+              expect(loggerSpy).toHaveBeenCalledWith(
+                expect.objectContaining({
+                  method: 'POST',
+                  path: '/test',
+                  error: 'audit db down',
+                }),
+              );
+              loggerSpy.mockRestore();
+              done();
+            }, 0);
+          },
+          error: done.fail,
+        });
     });
   });
 });

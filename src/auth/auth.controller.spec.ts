@@ -19,6 +19,8 @@ describe('AuthController', () => {
           provide: AuthService,
           useValue: {
             signIn: jest.fn(),
+            refresh: jest.fn(),
+            logout: jest.fn(),
           },
         },
       ],
@@ -54,6 +56,29 @@ describe('AuthController', () => {
       await expect(
         controller.signIn({ userid: 'testuser', password: 'wrong' }),
       ).rejects.toThrow(UnauthorizedException);
+    });
+  });
+
+  describe('refresh', () => {
+    it('refresh_token으로 새 access_token 반환', async () => {
+      authService.refresh.mockResolvedValue({ access_token: 'new.jwt.token' });
+
+      const result = await controller.refresh({
+        refresh_token: 'mock.refresh.token',
+      });
+
+      expect(result).toEqual({ access_token: 'new.jwt.token' });
+      expect(authService.refresh).toHaveBeenCalledWith('mock.refresh.token');
+    });
+  });
+
+  describe('logout', () => {
+    it('refresh_token을 무효화', async () => {
+      authService.logout.mockResolvedValue(undefined);
+
+      await controller.logout({ refresh_token: 'mock.refresh.token' });
+
+      expect(authService.logout).toHaveBeenCalledWith('mock.refresh.token');
     });
   });
 });

@@ -1,44 +1,27 @@
-<h1 align="center">Welcome to nestjs-prisma-hr 👋</h1>
-<p>
-  <img alt="Version" src="https://img.shields.io/badge/version-0.0.1-blue.svg?cacheSeconds=2592000" />
-  <img src="https://img.shields.io/badge/node-%3E%3D18.17.1-blue.svg" />
-  <img src="https://img.shields.io/badge/npm-%3E%3D9.6.7-blue.svg" />
-  <a href="#" target="_blank">
-    <img alt="License: UNLICENSED" src="https://img.shields.io/badge/License-UNLICENSED-yellow.svg" />
-  </a>
-</p>
+# nestjs-sequelize-hr
 
-> NestJS, Sequelize, MySQL, TypeScript를 이용한 REST API
+NestJS, Sequelize, MySQL, TypeScript를 이용한 HR REST API입니다.
 
-## Prerequisites
+## Requirements
 
-- node >=18.17.1
-- npm >=9.6.7
-- [download & run SQL script - MySQL](https://github.com/nomemory/hr-schema-mysql/blob/master/hr-schema-mysql.sql)
-  - DB & Table Create
-  - Sample Data Insert
+- Node.js >= 18.17.1
+- npm >= 9.6.7
+- MySQL
 
 ## Install
 
 ```sh
-$ npm install
+npm install
 ```
 
-## Usage
+## Environment
+
+`.env.local` 또는 `.env`에 아래 값을 설정합니다. `.env.local`이 `.env`보다 먼저 로드됩니다.
 
 ```sh
-# development mode
-$ npm run start:dev
+NODE_ENV=development
+LISTEN_PORT=3000
 
-# production mode
-$ npm run start:prod
-```
-
-## .env configuration
-
-```sh
-NODE_ENV=production
-PORT=3000
 DB_HOST=localhost
 DB_PORT=3306
 DB_USERNAME=username
@@ -47,19 +30,34 @@ DB_NAME=database
 DB_LOGGING=false
 DB_POOL_MAX=5
 DB_POOL_MIN=0
+DB_SYNC=false
+DB_MIGRATE=true
+
 JWT_SECRET=MDBjMWJlMzc4M2JhNGExY2FmNTRkZmU0NjlhNTRjYmY=
+REFRESH_TOKEN_TTL_DAYS=7
+ALLOWED_ORIGINS=http://localhost:3000
 ```
 
-## Author
+`DB_SYNC=true`는 Sequelize sync를 실행합니다. 일반 개발/운영에서는 migration 기반의 `DB_MIGRATE=true` 사용을 권장합니다.
 
-👤 **Changhoon Jee <chjee71@gmail.com>**
+## Run
 
-- Github: [@chjee](https://github.com/chjee)
+```sh
+npm run start:dev
+npm run start:prod
+```
 
-## Show your support
+Swagger 문서는 실행 후 `/api-docs`에서 확인할 수 있습니다.
 
-Give a ⭐️ if this project helped you!
+## Test and Quality
 
----
+```sh
+npm run build
+npm run lint
+npm run lint:fix
+npm test
+npm run test:e2e
+npm audit --omit=dev
+```
 
-_This README was generated with ❤️ by [readme-md-generator](https://github.com/kefranabg/readme-md-generator)_
+`npm run lint`는 검사만 수행하고, 자동 수정은 `npm run lint:fix`로 분리되어 있습니다.

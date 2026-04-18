@@ -51,7 +51,7 @@ describe('AppController (e2e)', () => {
       it('잘못된 자격증명 → 401', () => {
         return request(app.getHttpServer())
           .post('/auth/login')
-          .send({ userid: 'wronguser', password: 'wrongpass' })
+          .send({ userid: 'wronguser', password: 'Wrongpass1@' })
           .expect(401);
       });
 
@@ -70,6 +70,13 @@ describe('AppController (e2e)', () => {
           .send({ refresh_token: 'invalid-token' })
           .expect(401);
       });
+
+      it('refresh token 누락 → 400', () => {
+        return request(app.getHttpServer())
+          .post('/auth/refresh')
+          .send({})
+          .expect(400);
+      });
     });
 
     describe('Protected routes', () => {
@@ -81,12 +88,12 @@ describe('AppController (e2e)', () => {
         return request(app.getHttpServer()).get('/users').expect(401);
       });
 
-      it('토큰 없이 /employee 접근 → 401', () => {
-        return request(app.getHttpServer()).get('/employee').expect(401);
+      it('토큰 없이 /employees 접근 → 401', () => {
+        return request(app.getHttpServer()).get('/employees').expect(401);
       });
 
-      it('토큰 없이 /department 접근 → 401', () => {
-        return request(app.getHttpServer()).get('/department').expect(401);
+      it('토큰 없이 /departments 접근 → 401', () => {
+        return request(app.getHttpServer()).get('/departments').expect(401);
       });
     });
   });
