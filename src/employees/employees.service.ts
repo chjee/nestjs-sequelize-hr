@@ -40,14 +40,19 @@ export class EmployeesService {
     const { rows, count } = await this.employeeRepository.findAndCountAll({
       limit,
       offset: (page - 1) * limit,
-      include: [Job, Department],
+      include: [{ model: Job }, { model: Department }],
+      subQuery: false,
     });
     return { data: rows, total: count };
   }
 
   async findOne(id: number): Promise<Employee> {
     const employee = await this.employeeRepository.findOne<Employee>({
-      include: [Employee, Job, Department],
+      include: [
+        { model: Job },
+        { model: Department },
+        { model: Employee, as: 'manager' },
+      ],
       where: { employee_id: id },
     });
     if (!employee) {
